@@ -5,73 +5,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web bán Sách cũ</title>
     <meta name="description" content="Cho Phép Mua Sách Cũ Với Giá Phải Chăng Nhì - Uy Tín Top Nhì Việt Nam">
-    <link rel="stylesheet" href="..\frontend\src\index.css">
+    <!-- Đã sửa lại gạch chéo xuôi cho đường dẫn CSS -->
+    <link rel="stylesheet" href="../frontend/src/index.css">
 </head>
 <body>
-    <header class="site-header">
-        <div class="header-left">
-            <a href="./index.html" class="logo-header">
-                <img src="..\frontend\src\assets\logo-example.png" alt="Logo Web Bán Sách"/>
+    <header class="header-container">
+        <!-- Đã sửa "top=bar" thành "top-bar" -->
+        <div class="top-bar">
+            <a href="#" class="logo">
+                <span>Sách Cũ Giá Rẻ</span>
             </a>
+            <form class="search-box" action="/search" method="get">
+                <input
+                type="search"
+                name="q"
+                placeholder="Tìm Tên Sách, Tác Phẩm..."
+                required
+                />
+                <button type="submit">Tìm Sách</button>
+            </form>
+            <div class="user-actions">
+                <a href="#" class="btn-sell">Đăng Bán Sách</a>
+                <a href="#" class="cart-icon">Giỏ Hàng</a>
+                <a href="#" class="account-link">Đăng Nhập</a>
+            </div>
         </div>
-        <form class="search-form" action="/search" method="get">
-            <input type="search" name="q" placeholder="Tìm Tên Sách Cũ,...."/>
-            <button type="submit">Tìm</button>
-        </form>
-        <nav class="navigition-bar" aria-label="Vùng điều hướng">
-            <ul>
-                <li><a href="/">Trang Chủ</a></li>
-                <li><a href="/products">Sản Phẩm</a></li>
-                <li><a href="/products">Giỏ Hàng</a></li>
+
+        <nav class="main-nav" aria-label="Danh Mục Sách">
+            <ul class="nav-list">
+                <li><a href="#">Trang Chủ</a></li>
+                <li class="has-dropdown">
+                    <a href="#">Thể loại sách</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Sách Văn Học - Tiểu Thuyết</a></li>
+                        <li><a href="#">Sách Kinh Tế - Kỹ Năng</a></li>
+                        <li><a href="#">Giáo Trình Và Sách Cũ Phổ Thông</a></li>
+                        <li><a href="#">Truyện Tranh - Manga - LN</a></li>
+                        <li><a href="#">Sách Nước Ngoài</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">Sách Hiếm - Sưu Tầm</a></li>
+                <li><a href="#">Liên Hệ / Hỗ Trợ</a></li>
             </ul>
         </nav>
     </header>
-    <nav class="main-nav" aria-label="Danh mục sách">
-        <ul class="main-nav__list">
-            <li class="main-nav__item main-nav__item--has-submenu active">
-                <a href="#">Danh Mục Sản Phẩm</a>
-                <ul class="main-nav__submenu">
-                    <li><a href="#">Sách mới</a></li>
-                    <li><a href="#">Sách bán chạy</a></li>
-                </ul>
-            </li>
-
-            <li class="main-nav__item main-nav__item--has-submenu">
-                <a href="#">Tất Cả Sản Phẩm</a>
-                <ul class="main-nav__submenu">
-                    <li><a href="#">Sách mới</a></li>
-                    <li><a href="#">Sách cũ</a></li>
-                </ul>
-            </li>
-
-            <li class="main-nav__item main-nav__item--has-submenu">
-                <a href="#">Văn Học Nước Ngoài</a>
-                <ul class="main-nav__submenu">
-                    <li><a href="#">Tiểu thuyết</a></li>
-                    <li><a href="#">Truyện ngắn</a></li>
-                </ul>
-            </li>
-
-            <li class="main-nav__item main-nav__item--has-submenu">
-                <a href="#">Văn Học Việt Nam</a>
-                <ul class="main-nav__submenu">
-                    <li><a href="#">Tiểu thuyết</a></li>
-                    <li><a href="#">Truyện ngắn</a></li>
-                    <li><a href="#">Thơ Việt Nam</a></li>
-                </ul>
-            </li>
-
-            <li class="main-nav__item main-nav__item--has-submenu">
-                <a href="#">Khác</a>
-                <ul class="main-nav__submenu">
-                    <li><a href="#">Sách kỹ năng</a></li>
-                    <li><a href="#">Sách thiếu nhi</a></li>
-                </ul>
-            </li>
-        </ul>
-    </nav>
     <main>
 
     </main>
+<footer>
+ <div>
+ <nav aria-label="Điều hướng chân trang">
+ <ul>
+ <li><a href="#">Giới thiệu tiệm sách</a></li>
+ <li><a href="#">Chính sách thu mua &amp; đổi trả</a></li>
+ <li><a href="#">Hướng dẫn thanh toán</a></li>
+ <li><a href="#">Bảo mật thông tin</a></li>
+ <li><a href="#">Liên hệ &amp; Góp ý</a></li>
+ </ul> </nav>
+ <div> <p>© 2026 <strong>SáchCũGiáRẻ</strong>. Tất cả quyền được bảo lưu.</p> </div> </div> </footer>
 </body>
 </html>
