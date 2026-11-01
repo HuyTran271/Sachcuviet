@@ -49,8 +49,36 @@
             </ul>
         </nav>
     </header>
-    <main>
+    <main class="main-content">
+        <section class="book-section" aria-labelledby="title-featured">
+            <div class="section-header">
+                <h2 id="title-featured">Sách nổi bật</h2>
+                <a href="products.html?type=featured" class="view-all-link">Xem Tất Cả</a>
+            </div>
+            <div class="book-list" id="featured-books">
+                <article class="book-card">
+                    <img src="src/assets/sach-dac-nhan-tam.jpg" alt="Bìa sách đắc nhân tâm" class="book-card__img">
+                    <h3 class="book-card__title">Đắc Nhân Tâm</h3>
+                    <p class="book-card__price">85.000 đ</p>
+                    <button class="book-card__btn" data-id="1">Mua Ngay</button>
+                </article>
+            </div>
+        </section>
+        <section class="book-section" aria-labelledby="title-new">
+            <div class="section-header">
+                <h2 id="title-new">Sách Mới</h2>
+                <a href="products.html?type=new" class="view-all-link">Xem Tất cả</a>
+            </div>
+            <div class="book-list" id="new-books"></div>
+        </section>
+        <section class="book-section" aria-labelledby="title-category">
+            <div class="section-header">
+                <h2 id="title-category">Thể loại: Công Nghệ Thông Tin</h2>
+                <a href="products.html?catogory=it" class="view-all-link">Xem Tất Cả</a>
 
+            </div>
+            <div class="book-list" id="category-books"></div>
+        </section>
     </main>
 <footer>
  <div>
