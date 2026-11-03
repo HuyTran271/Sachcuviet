@@ -1,0 +1,123 @@
+:root {
+  /* ========================================
+     BRAND — PRIMARY
+  ======================================== */
+  --color-primary-900: #173F35;
+  --color-primary-800: #205447;
+  --color-primary-700: #286B59;
+  --color-primary-600: #347D68;
+  --color-primary-100: #DDEBE4;
+  --color-primary-50: #F0F6F2;
+
+  /* ========================================
+     BRAND — ACCENT
+  ======================================== */
+  --color-accent-700: #A84F32;
+  --color-accent-600: #C06443;
+  --color-accent-100: #F5E2D8;
+  --color-accent-50: #FBF1EB;
+
+  /* ========================================
+     NEUTRAL
+  ======================================== */
+  --color-background: #FAF8F3;
+  --color-surface: #FFFFFF;
+  --color-surface-secondary: #F2EEE5;
+
+  --color-border: #E5E0D5;
+  --color-border-strong: #C9C3B7;
+
+  --color-text-primary: #252923;
+  --color-text-secondary: #666B63;
+  --color-text-muted: #858980;
+  --color-text-inverse: #FFFFFF;
+
+  /* ========================================
+     SEMANTIC
+  ======================================== */
+  --color-success: #26734D;
+  --color-success-bg: #E7F4EB;
+
+  --color-warning: #996515;
+  --color-warning-bg: #FFF3D6;
+
+  --color-error: #B42318;
+  --color-error-bg: #FDECEA;
+
+  --color-info: #245D9C;
+  --color-info-bg: #EAF2FC;
+
+  --color-rating: #D99A26;
+
+  /* ========================================
+     INTERACTIVE
+  ======================================== */
+  --color-button-primary: var(--color-primary-700);
+  --color-button-primary-hover: var(--color-primary-800);
+  --color-button-primary-text: var(--color-text-inverse);
+
+  --color-link: var(--color-primary-700);
+  --color-link-hover: var(--color-primary-900);
+
+  --color-focus-ring: var(--color-primary-600);
+
+  /* ========================================
+     GLOBAL LAYOUT
+  ======================================== */
+  --color-header: var(--color-surface);
+  --color-footer: var(--color-primary-900);
+  --color-card: var(--color-surface);
+
+  /* ========================================
+     BORDER RADIUS
+  ======================================== */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* ========================================
+     SHADOWS
+  ======================================== */
+  --shadow-sm: 0 1px 3px rgb(37 41 35 / 6%);
+  --shadow-md: 0 4px 12px rgb(37 41 35 / 8%);
+  --shadow-lg: 0 10px 30px rgb(37 41 35 / 12%);
+
+  /* ========================================
+     TRANSITIONS
+  ======================================== */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+}
+
+/* Global defaults */
+body {
+  margin: 0;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: Inter, "Segoe UI", sans-serif;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+a {
+  color: var(--color-link);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--color-link-hover);
+}
