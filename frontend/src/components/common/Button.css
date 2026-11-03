@@ -1,0 +1,125 @@
+.app-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
+  user-select: none;
+  text-decoration: none;
+}
+
+.app-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.app-button:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* SIZES */
+.btn-sm {
+  padding: 8px 14px;
+  font-size: 13px;
+  border-radius: var(--radius-sm);
+}
+
+.btn-md {
+  padding: 12px 20px;
+  font-size: 15px;
+  min-height: 46px;
+}
+
+.btn-lg {
+  padding: 14px 28px;
+  font-size: 16px;
+  min-height: 52px;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+/* VARIANTS */
+.btn-primary {
+  background-color: var(--color-button-primary);
+  color: var(--color-button-primary-text);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--color-button-primary-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+  background-color: var(--color-surface-secondary);
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--color-border);
+}
+
+.btn-outline {
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background-color: var(--color-surface-secondary);
+  border-color: var(--color-border-strong);
+}
+
+.btn-accent {
+  background-color: var(--color-accent-600);
+  color: var(--color-text-inverse);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-accent:hover:not(:disabled) {
+  background-color: var(--color-accent-700);
+  box-shadow: var(--shadow-md);
+}
+
+/* DISABLED & LOADING */
+.app-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.btn-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--color-surface-secondary);
+  border-top-color: currentColor;
+  border-radius: var(--radius-full);
+  animation: spin 700ms linear infinite;
+  display: inline-block;
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
