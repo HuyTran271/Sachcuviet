@@ -12,6 +12,11 @@ const loginUser = async (req, res, next) => {
         const { email, password } = req.body;
 
         const user = await User.findOne({ email });
+        if (user && user.status === 'locked') {
+    return res.status(403).json({
+        message: 'Tài khoản đã bị khóa'
+    });
+}
 
         if (!user) {
             return res.status(401).json({

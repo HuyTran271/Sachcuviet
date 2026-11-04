@@ -1,3 +1,4 @@
+
 import mongoose from 'mongoose';
 
 const UserSchema = new mongoose.Schema({
@@ -6,26 +7,39 @@ const UserSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+
     email: {
         type: String,
         required: true,
         trim: true,
-        unique: true
+        unique: true,
+        lowercase: true
     },
+
     password: {
         type: String,
         required: true,
         trim: true
     },
+
     role: {
         type: String,
         enum: ['user', 'admin'],
         default: 'user'
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
+
+    status: {
+        type: String,
+        enum: ['active', 'locked'],
+        default: 'active'
     },
+
+    phone: {
+        type: String,
+        default: ''
+    }
+}, {
+    timestamps: true
 });
 
 const User = mongoose.model('User', UserSchema);
