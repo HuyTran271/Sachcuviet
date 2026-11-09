@@ -13,7 +13,7 @@ const protect = async (req, res, next) => {
             return res.status(401).json({ message: 'Xác thực thất bại. Không có token được cung cấp.' });
         }
 
-        const decodedToken = jwt.verify(token, process.env.JWT_SECRET || 'sachcuviet_super_secret_jwt_key_2026');
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
 
         if (!decodedToken) {
             return res.status(401).json({ message: 'Xác thực thất bại. Token không hợp lệ.' });

@@ -8,7 +8,17 @@ import userRoutes from './routes/userRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 
 const app = express();
-const port = process.env.PORT || 3003;
+const port = process.env.PORT;
+
+if (!process.env.JWT_SECRET) {
+    console.error('JWT_SECRET chưa được khai báo trong môi trường');
+    process.exit(1); // Exit the application with an error code
+}
+
+if (!process.env.MONGODB_URL) {
+    console.error('MONGODB_URL chưa được khai báo trong môi trường');
+    process.exit(1); // Exit the application with an error code
+}
 
 // Connect Database
 connectDB();
