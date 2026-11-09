@@ -106,7 +106,6 @@ const registerUser = async (req, res, next) => {
 
         generateToken(res, user);
 
-
         res.status(201).json({
             message: 'Đăng ký người dùng thành công',
             _id: user._id,
