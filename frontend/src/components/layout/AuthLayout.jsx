@@ -93,6 +93,7 @@ export default function AuthLayout({
             </svg>
             <span>Sách Cũ Việt</span>
           </Link>
+          <p className="mobile-brand-subtitle">{subtitle}</p>
         </div>
 
         <div className="auth-form-card">

@@ -27,6 +27,12 @@ const loginUser = async (req, res, next) => {
             });
         }
 
+        if (user.status !== 'active') {
+            return res.status(403).json({
+                message: 'Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.',
+            }); 
+        }
+
         const token = jwt.sign(
             { id: user._id, role: user.role },
             process.env.JWT_SECRET || 'sachcuviet_super_secret_jwt_key_2026',
@@ -45,7 +51,7 @@ const loginUser = async (req, res, next) => {
             name: user.name,
             email: user.email,
             role: user.role,
-            token,
+            token
         });
     } catch (error) {
         next(error);
@@ -96,6 +102,7 @@ const registerUser = async (req, res, next) => {
             name: user.name,
             email: user.email,
             role: user.role,
+            status: user.status,
         });
     } catch (error) {
         next(error);

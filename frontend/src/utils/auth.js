@@ -22,7 +22,7 @@ export const setCurrentUser = (user) => {
 
 
 export const loginUser = async ({ email, password }) => {
-  const response = await fetch(`${API_BASE_URL}/users/login`, {
+  const response = await fetch(`${API_BASE_URL}/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -49,8 +49,8 @@ export const loginUser = async ({ email, password }) => {
 };
 
 
-export const registerUser = async ({ fullName, email, phone, password }) => {
-  const response = await fetch(`${API_BASE_URL}/users/register`, {
+export const registerUser = async ({ fullName, email, password }) => {
+  const response = await fetch(`${API_BASE_URL}/auth/register`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -83,7 +83,7 @@ export const registerUser = async ({ fullName, email, phone, password }) => {
 
 export const logout = async () => {
   try {
-    await fetch(`${API_BASE_URL}/users/logout`, {
+    await fetch(`${API_BASE_URL}/auth/logout`, {
       method: 'POST',
       credentials: 'include'
     });

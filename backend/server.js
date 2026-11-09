@@ -5,6 +5,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import userRoutes from './routes/userRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 
 const app = express();
 const port = process.env.PORT || 3003;
@@ -21,6 +22,7 @@ app.use(cookieParser());
 
 // Routes
 app.use('/api/users', userRoutes);
+app.use('/api/auth', authRoutes); 
 
 // Root test endpoint
 app.get('/', (req, res) => {
