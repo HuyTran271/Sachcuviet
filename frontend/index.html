@@ -1,95 +1,20 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web bán Sách cũ</title>
-    <meta name="description" content="Cho Phép Mua Sách Cũ Với Giá Phải Chăng Nhì - Uy Tín Top Nhì Việt Nam">
-    <!-- Đã sửa lại gạch chéo xuôi cho đường dẫn CSS -->
-    <link rel="stylesheet" href="../frontend/src/index.css">
-</head>
-<body>
-    <header class="header-container">
-        <!-- Đã sửa "top=bar" thành "top-bar" -->
-        <div class="top-bar">
-            <a href="#" class="logo">
-                <span>Sách Cũ Giá Rẻ</span>
-            </a>
-            <form class="search-box" action="/search" method="get">
-                <input
-                type="search"
-                name="q"
-                placeholder="Tìm Tên Sách, Tác Phẩm..."
-                required
-                />
-                <button type="submit">Tìm Sách</button>
-            </form>
-            <div class="user-actions">
-                <a href="#" class="btn-sell">Đăng Bán Sách</a>
-                <a href="#" class="cart-icon">Giỏ Hàng</a>
-                <a href="#" class="account-link">Đăng Nhập</a>
-            </div>
-        </div>
-
-        <nav class="main-nav" aria-label="Danh Mục Sách">
-            <ul class="nav-list">
-                <li><a href="#">Trang Chủ</a></li>
-                <li class="has-dropdown">
-                    <a href="#">Thể loại sách</a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#">Sách Văn Học - Tiểu Thuyết</a></li>
-                        <li><a href="#">Sách Kinh Tế - Kỹ Năng</a></li>
-                        <li><a href="#">Giáo Trình Và Sách Cũ Phổ Thông</a></li>
-                        <li><a href="#">Truyện Tranh - Manga - LN</a></li>
-                        <li><a href="#">Sách Nước Ngoài</a></li>
-                    </ul>
-                </li>
-                <li><a href="#">Sách Hiếm - Sưu Tầm</a></li>
-                <li><a href="#">Liên Hệ / Hỗ Trợ</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main class="main-content">
-        <section class="book-section" aria-labelledby="title-featured">
-            <div class="section-header">
-                <h2 id="title-featured">Sách nổi bật</h2>
-                <a href="products.html?type=featured" class="view-all-link">Xem Tất Cả</a>
-            </div>
-            <div class="book-list" id="featured-books">
-                <article class="book-card">
-                    <img src="src/assets/sach-dac-nhan-tam.jpg" alt="Bìa sách đắc nhân tâm" class="book-card__img">
-                    <h3 class="book-card__title">Đắc Nhân Tâm</h3>
-                    <p class="book-card__price">85.000 đ</p>
-                    <button class="book-card__btn" data-id="1">Mua Ngay</button>
-                </article>
-            </div>
-        </section>
-        <section class="book-section" aria-labelledby="title-new">
-            <div class="section-header">
-                <h2 id="title-new">Sách Mới</h2>
-                <a href="products.html?type=new" class="view-all-link">Xem Tất cả</a>
-            </div>
-            <div class="book-list" id="new-books"></div>
-        </section>
-        <section class="book-section" aria-labelledby="title-category">
-            <div class="section-header">
-                <h2 id="title-category">Thể loại: Công Nghệ Thông Tin</h2>
-                <a href="products.html?catogory=it" class="view-all-link">Xem Tất Cả</a>
-
-            </div>
-            <div class="book-list" id="category-books"></div>
-        </section>
-    </main>
-<footer>
- <div>
- <nav aria-label="Điều hướng chân trang">
- <ul>
- <li><a href="#">Giới thiệu tiệm sách</a></li>
- <li><a href="#">Chính sách thu mua &amp; đổi trả</a></li>
- <li><a href="#">Hướng dẫn thanh toán</a></li>
- <li><a href="#">Bảo mật thông tin</a></li>
- <li><a href="#">Liên hệ &amp; Góp ý</a></li>
- </ul> </nav>
- <div> <p>© 2026 <strong>SáchCũGiáRẻ</strong>. Tất cả quyền được bảo lưu.</p> </div> </div> </footer>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/book-favicon.svg" />
+    <meta name="description" content="Khám phá Sách Cũ Việt: tìm sách theo tên, tác giả và thể loại, lưu những cuốn sách bạn yêu thích." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sách Cũ Việt - Chợ Mua Bán Sách Cũ Trực Tuyến</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400&amp;display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useOutletContext, useLocation } from 'react-router-dom';
 import AuthLayout from '../../components/layout/AuthLayout';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
@@ -9,6 +9,10 @@ import './Login.css';
 
 export default function Login() {
   const navigate = useNavigate();
+  const { setUser } = useOutletContext();
+  const location = useLocation();
+  const from = location.state?.from;
+  const returnTo = typeof from === 'string' && from.startsWith('/') && !from.startsWith('//') && !/^\/(login|register)(?:[/?#]|$)/.test(from) ? from : '/';
 
   const [formData, setFormData] = useState({
     email: '',
@@ -62,11 +66,12 @@ export default function Login() {
         password: formData.password
       });
 
+      setUser(user);
       setSuccessMessage(`Đăng nhập thành công! Chào mừng ${user.fullName || user.email} trở lại.`);
 
       // Chuyển hướng vào trang chủ
       setTimeout(() => {
-        navigate('/');
+        navigate(returnTo, { replace: true });
       }, 600);
     } catch (err) {
       setServerError(err.message || 'Không thể kết nối đến máy chủ Backend.');
@@ -76,13 +81,9 @@ export default function Login() {
   };
 
   return (
-    <AuthLayout
-      badgeText="Thành viên Sách Cũ Việt"
-      title="Sách Cũ Việt"
-      subtitle="Đăng nhập để tiếp tục khám phá kho sách"
-    >
+    <AuthLayout>
       <div className="login-header">
-        <h2 className="login-title">Đăng nhập tài khoản</h2>
+        <h1 className="login-title">Đăng nhập tài khoản</h1>
         <p className="login-subtitle">
           Truy cập tủ sách cá nhân, đơn hàng và các tựa sách bạn quan tâm
         </p>

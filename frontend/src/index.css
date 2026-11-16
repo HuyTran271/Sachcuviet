@@ -9,8 +9,12 @@
 }
 
 body {
-    background-color: #f8f6f0;
-    color: #2c2c2c;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* =========================================
