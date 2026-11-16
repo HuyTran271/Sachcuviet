@@ -1,0 +1,65 @@
+{
+  "note": "Sample cover images for the frontend demo; source artwork belongs to the respective publishers/authors.",
+  "images": [
+    {
+      "file": "nha-gia-kim.jpg",
+      "source": "https://cdn1.fahasa.com/media/catalog/product/i/m/image_195509_1_36793.jpg",
+      "page": "https://www.fahasa.com/nha-gia-kim-tai-ban-2020.html"
+    },
+    {
+      "file": "di-tim-le-song.jpg",
+      "source": "https://cdn1.fahasa.com/media/catalog/product/t/h/thumb-01113.jpg",
+      "page": "https://www.fahasa.com/di-tim-le-song-tai-ban-2022.html"
+    },
+    {
+      "file": "cay-cam-ngot-cua-toi.jpg",
+      "source": "https://cdn1.fahasa.com/media/catalog/product/i/m/image_217480_1.jpg",
+      "page": "https://www.fahasa.com/cay-cam-ngot-cua-toi-tai-ban-2026.html"
+    },
+    {
+      "file": "tam-ly-hoc-ve-tien.jpg",
+      "source": "https://cdn1.fahasa.com/media/catalog/product/i/m/image_220008.jpg",
+      "page": "https://www.fahasa.com/tam-ly-hoc-ve-tien.html"
+    },
+    {
+      "file": "de-men-phieu-luu-ky.jpg",
+      "source": "https://cdn1.fahasa.com/media/catalog/product/8/9/8935036681461.jpg",
+      "page": "https://www.fahasa.com/de-men-phieu-luu-ky-118625.html"
+    },
+    {
+      "file": "tuoi-tre-dang-gia-bao-nhieu.jpg",
+      "source": "https://cdn1.fahasa.com/media/catalog/product/i/m/image_239651_1_1.jpg",
+      "page": "https://www.fahasa.com/tuoi-tre-dang-gia-bao-nhieu-tai-ban-2026.html"
+    },
+    {
+      "file": "mat-biec.jpg",
+      "source": "https://cdn1.fahasa.com/media/catalog/product/8/9/8934974178637.jpg",
+      "page": "https://www.fahasa.com/mat-biec-tai-ban-2022.html"
+    },
+    {
+      "file": "english-grammar-in-use.jpg",
+      "source": "https://cdn1.fahasa.com/media/catalog/product/i/m/image_228969.jpg",
+      "page": "https://www.fahasa.com/english-grammar-in-use-book-with-answers-5th-edition.html"
+    },
+    {
+      "file": "nhap-mon-lap-trinh.jpg",
+      "source": "https://www.uit.edu.vn/media/nhap_e18332f020.jpeg",
+      "page": "https://www.uit.edu.vn/bai-viet/gioi-thieu-sach-nhap-mon-lap-trinh"
+    },
+    {
+      "file": "tu-duy-nhanh-va-cham.jpg",
+      "source": "https://cdn1.fahasa.com/media/catalog/product/0/_/0_191.jpg",
+      "page": "https://www.fahasa.com/tu-duy-nhanh-va-cham.html"
+    },
+    {
+      "file": "hoang-tu-be.jpg",
+      "source": "https://cdn1.fahasa.com/media/catalog/product/8/9/8936071676740.jpg",
+      "page": "https://www.fahasa.com/hoang-tu-be-tai-ban-2019-264754.html"
+    },
+    {
+      "file": "tu-hoc-tieng-nhat.jpg",
+      "source": "https://cdn1.fahasa.com/media/catalog/product/8/9/8935210213532_1.jpg",
+      "page": "https://www.fahasa.com/tu-hoc-tieng-nhat-cho-nguoi-moi-bat-dau.html"
+    }
+  ]
+}
