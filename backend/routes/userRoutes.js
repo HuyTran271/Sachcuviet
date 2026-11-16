@@ -1,13 +1,21 @@
-﻿import express from 'express';
-import { loginUser, registerUser, logoutUser } from '../controllers/authController.js';
-import { getUserProfile, getAdminDashboard } from '../controllers/userController.js';
+import express from 'express';
+import {
+    loginUser,
+    registerUser,
+    logoutUser,
+    getUserProfile,
+    getAdminDashboard,
+} from '../controllers/userController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
-// Compatibility for the existing frontend and clients using /api/users.
+
+// Public routes
 router.post('/login', loginUser);
 router.post('/register', registerUser);
-router.post('/logout', logoutUser);
+
+// User-protected route (requires login)
+router.post('/logout', protect, logoutUser);
 router.get('/profile', protect, getUserProfile);
-router.get('/admin-dashboard', protect, admin, getAdminDashboard);
+
 export default router;

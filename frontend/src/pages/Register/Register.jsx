@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate, useOutletContext } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout from '../../components/layout/AuthLayout';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
@@ -9,7 +9,6 @@ import './Register.css';
 
 export default function Register() {
   const navigate = useNavigate();
-  const { setUser } = useOutletContext();
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -120,7 +119,6 @@ export default function Register() {
         password: formData.password
       });
 
-      setUser(user);
       setSuccessMessage(
         `Chúc mừng ${user.fullName}! Tài khoản đã được tạo thành công. Đang chuyển hướng...`
       );
@@ -137,9 +135,13 @@ export default function Register() {
   };
 
   return (
-    <AuthLayout>
+    <AuthLayout
+      badgeText="Đăng ký thành viên mới"
+      title="Sách Cũ Việt"
+      subtitle="Tham gia cùng hơn 25,000+ độc giả trên cả nước"
+    >
       <div className="register-header">
-        <h1 className="register-title">Tạo tài khoản mới</h1>
+        <h2 className="register-title">Tạo tài khoản mới</h2>
         <p className="register-subtitle">
           Mua bán, trao đổi sách cũ nhanh chóng, an toàn và tiết kiệm
         </p>

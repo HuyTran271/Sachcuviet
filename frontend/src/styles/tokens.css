@@ -1,7 +1,4 @@
 :root {
-  --font-body: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-heading: 'Noto Serif', 'Times New Roman', serif;
-
   /* ========================================
      BRAND — PRIMARY
   ======================================== */
@@ -99,7 +96,7 @@ body {
   margin: 0;
   background-color: var(--color-background);
   color: var(--color-text-primary);
-  font-family: var(--font-body);
+  font-family: Inter, "Segoe UI", sans-serif;
 }
 
 button,
