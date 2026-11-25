@@ -1,6 +1,5 @@
 import User from './models/User.js';
 import connectDB from './config/config.js';
-import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -11,14 +10,15 @@ if (!process.env.SEED_ADMIN_EMAIL || !process.env.SEED_ADMIN_PASSWORD) {
 }
 
 const adminSeeder = async () => {
-    const hashPassword = await bcrypt.hash(process.env.SEED_ADMIN_PASSWORD, 10);
+    // Truyen mat khau goc, de hook pre('save') cua User hash mot lan duy nhat.
+    // Neu tu hash truoc roi save() thi hook se hash lan 2 va admin khong dang nhap duoc.
     try {
         const existingAdmin = await User.findOne({ email: process.env.SEED_ADMIN_EMAIL });
         if (!existingAdmin) {
             const admin = new User({
                 name: 'Admin',
                 email: process.env.SEED_ADMIN_EMAIL,
-                password: hashPassword,
+                password: process.env.SEED_ADMIN_PASSWORD,
                 role: 'admin'
             });
             await admin.save();

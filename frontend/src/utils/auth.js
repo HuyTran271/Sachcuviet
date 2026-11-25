@@ -81,6 +81,48 @@ export const registerUser = async ({ fullName, email, password }) => {
 };
 
 
+export const getProfile = async () => {
+  const response = await fetch(`${API_BASE_URL}/users/profile`, {
+    method: 'GET',
+    credentials: 'include'
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.message || 'Không tải được thông tin hồ sơ.');
+  }
+  const user = data.user || data;
+  const userSession = {
+    id: user._id,
+    fullName: user.name || user.fullName,
+    email: user.email,
+    role: user.role || 'user'
+  };
+  setCurrentUser(userSession);
+  return userSession;
+};
+
+export const updateProfile = async ({ fullName }) => {
+  const response = await fetch(`${API_BASE_URL}/users/profile`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ name: fullName })
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.message || 'Cập nhật hồ sơ không thành công.');
+  }
+  const user = data.user || data;
+  const userSession = {
+    id: user._id,
+    fullName: user.name || user.fullName,
+    email: user.email,
+    role: user.role || 'user'
+  };
+  setCurrentUser(userSession);
+  return userSession;
+};
+
 export const logout = async () => {
   try {
     await fetch(`${API_BASE_URL}/auth/logout`, {

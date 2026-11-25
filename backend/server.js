@@ -8,7 +8,7 @@ import userRoutes from './routes/userRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 3003;
 
 if (!process.env.JWT_SECRET) {
     console.error('JWT_SECRET chưa được khai báo trong môi trường');

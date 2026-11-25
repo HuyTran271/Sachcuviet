@@ -13,7 +13,6 @@ export default function Register() {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
-    phone: '',
     password: '',
     confirmPassword: '',
     agreeTerms: false
@@ -106,10 +105,10 @@ export default function Register() {
     setServerError('');
 
     try {
+      // Khong thu so dien thoai o dang ky: SDT chuyen sang buoc dat hang.
       const user = await registerUser({
         fullName: formData.fullName,
         email: formData.email,
-        phone: formData.phone,
         password: formData.password
       });
 
