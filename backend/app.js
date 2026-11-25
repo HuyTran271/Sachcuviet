@@ -27,10 +27,21 @@ app.use(cors({
 app.use(cookieParser());
 
 // Anh upload local: dam bao thu muc ton tai roi phuc vu static /uploads.
+// CSP sandbox: du co file HTML lot vao duoc thi trinh duyet cung khong
+// cho no chay script khi mo truc tiep. nosniff chan trinh duyet doan
+// lai Content-Type (vi du doan file anh thanh text/html).
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const uploadsDir = path.join(__dirname, 'uploads');
 fs.mkdirSync(uploadsDir, { recursive: true });
-app.use('/uploads', express.static(uploadsDir));
+app.use(
+    '/uploads',
+    (req, res, next) => {
+        res.setHeader('Content-Security-Policy', 'sandbox');
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+        next();
+    },
+    express.static(uploadsDir)
+);
 
 // Routes
 app.use('/api/users', userRoutes);
@@ -50,7 +61,15 @@ app.get('/', (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-    const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+    // Loi do middleware tu nem co statusCode rieng (vi du fileFilter
+    // cua multer nem 400) thi ton trong no; loi gioi han cua multer
+    // (file qua lon, qua nhieu file) cung la 400, khong phai 500.
+    let statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+    if (err && typeof err.statusCode === 'number') {
+        statusCode = err.statusCode;
+    } else if (err && typeof err.code === 'string' && err.code.startsWith('LIMIT_')) {
+        statusCode = 400;
+    }
     res.status(statusCode).json({
         message: err.message || 'Internal Server Error',
         stack: process.env.NODE_ENV === 'production' ? null : err.stack
