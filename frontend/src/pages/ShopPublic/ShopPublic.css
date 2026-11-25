@@ -1,0 +1,202 @@
+.shop-public-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-background);
+}
+
+.shop-public-main {
+  flex: 1;
+  padding: 24px 16px 48px;
+}
+
+.shop-public-content {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.shop-public-status {
+  padding: 32px 16px;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+/* ---------- Thông tin gian hàng ---------- */
+
+.shop-public-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.shop-public-avatar,
+.shop-public-avatar-placeholder {
+  width: 96px;
+  height: 96px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+}
+
+.shop-public-avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-primary-100);
+  color: var(--color-primary-700);
+  font-size: 36px;
+  font-weight: 700;
+}
+
+.shop-public-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.shop-public-name {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.shop-public-owner {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.shop-public-description {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.shop-public-section-title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* ---------- Lưới sản phẩm (giống thẻ ở Home) ---------- */
+
+.shop-public-product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.shop-public-product-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: box-shadow var(--transition-normal), transform var(--transition-normal);
+}
+
+.shop-public-product-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.shop-public-product-image-wrap {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background-color: var(--color-surface-secondary);
+}
+
+.shop-public-product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.shop-public-product-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.shop-public-product-condition {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary-900);
+  color: var(--color-text-inverse);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.shop-public-product-body {
+  flex: 1;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.shop-public-product-name {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.shop-public-product-author {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.shop-public-product-price {
+  margin-top: 4px;
+  color: var(--color-accent-600);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.shop-public-product-stock {
+  color: var(--color-success);
+  font-size: 13px;
+}
+
+.shop-public-product-stock.out-of-stock {
+  color: var(--color-error);
+}
+
+.shop-public-product-body .app-button {
+  margin-top: 8px;
+}
+
+@media (min-width: 640px) {
+  .shop-public-main {
+    padding: 32px 24px 56px;
+  }
+
+  .shop-public-header {
+    flex-direction: row;
+    align-items: center;
+  }
+}
