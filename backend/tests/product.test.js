@@ -5,7 +5,7 @@ import User from '../models/User.js';
 import Shop from '../models/Shop.js';
 import Product from '../models/Product.js';
 import app from '../app.js';
-import { startTestDb, stopTestDb, seedUsers, makeProduct } from './helpers.js';
+import { startTestDb, stopTestDb, seedUsers, makeProduct, authCookie } from './helpers.js';
 
 // Test cho N3 (loc san pham theo shop o backend) va C2 (seller khong
 // duoc doi status san pham).
@@ -64,5 +64,46 @@ describe('N3: loc san pham theo shop o backend', () => {
         const res = await request(app).get('/api/products').expect(200);
         expect(res.body.products).toHaveLength(12);
         expect(res.body.total).toBe(15);
+    });
+});
+
+describe('C2: seller khong duoc doi status san pham', () => {
+    it('seller gui status=active thi bi bo qua: san pham admin vua an van an, cac field khac van doi duoc', async () => {
+        const product = await makeProduct({
+            shop: ctx.shop,
+            category: ctx.category,
+            stock: 5,
+            status: 'inactive',
+            name: 'Sach bi an',
+        });
+
+        const res = await request(app)
+            .put(`/api/products/${product._id}`)
+            .set('Cookie', authCookie(ctx.seller))
+            .send({ status: 'active', name: 'Ten moi' });
+        expect(res.status).toBe(200);
+
+        const after = await Product.findById(product._id);
+        expect(after.status).toBe('inactive');
+        expect(after.name).toBe('Ten moi');
+    });
+
+    it('admin van doi duoc status qua route admin', async () => {
+        const product = await makeProduct({
+            shop: ctx.shop,
+            category: ctx.category,
+            stock: 5,
+            status: 'inactive',
+            name: 'Sach bi an',
+        });
+
+        const res = await request(app)
+            .put(`/api/admin/products/${product._id}/status`)
+            .set('Cookie', authCookie(ctx.admin))
+            .send({ status: 'active' });
+        expect(res.status).toBe(200);
+
+        const after = await Product.findById(product._id);
+        expect(after.status).toBe('active');
     });
 });

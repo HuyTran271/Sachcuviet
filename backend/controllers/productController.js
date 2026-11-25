@@ -200,7 +200,11 @@ const updateProduct = async (req, res, next) => {
         const owned = await getOwnedProduct(req, res);
         if (!owned) return;
         const { product } = owned;
-        const { name, category, description, price, stock, condition, status, author } = req.body || {};
+        // C2: seller KHONG duoc doi status. Status chi admin duoc doi qua
+        // PUT /api/admin/products/:id/status, neu de seller doi o day
+        // thi seller tu mo lai san pham admin vua an. Field status gui
+        // kem se bi bo qua (cac field khac van cap nhat binh thuong).
+        const { name, category, description, price, stock, condition, author } = req.body || {};
 
         if (name !== undefined) {
             if (typeof name !== 'string' || !name.trim()) {
@@ -241,12 +245,6 @@ const updateProduct = async (req, res, next) => {
                 return res.status(400).json({ message: 'Tình trạng sản phẩm phải là new hoặc used.' });
             }
             product.condition = condition;
-        }
-        if (status !== undefined) {
-            if (!['active', 'inactive'].includes(status)) {
-                return res.status(400).json({ message: 'Trạng thái sản phẩm phải là active hoặc inactive.' });
-            }
-            product.status = status;
         }
         if (author !== undefined) {
             if (typeof author !== 'string') {
