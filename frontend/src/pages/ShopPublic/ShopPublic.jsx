@@ -13,11 +13,6 @@ function formatPrice(price) {
   return `${value.toLocaleString('vi-VN')} đ`;
 }
 
-function getShopId(product) {
-  if (!product.shop) return null;
-  return typeof product.shop === 'string' ? product.shop : product.shop._id;
-}
-
 export default function ShopPublic() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -38,18 +33,13 @@ export default function ShopPublic() {
       }
     });
 
-    // LƯU Ý: backend chưa có lọc sản phẩm theo shop ở GET /products,
-    // nên trang này lấy tối đa 100 sản phẩm rồi lọc ở client theo
-    // product.shop._id === id. Khi backend hỗ trợ ?shop=<id> thì
-    // thay bằng listProducts({ shop: id }) và bỏ bước lọc client này.
-    Promise.all([getShop(id), listProducts({ limit: 100 })])
+    // Backend loc san pham theo shop o GET /products?shop=<id>,
+    // frontend chi viec lay dung sach cua shop nay (toi da 100).
+    Promise.all([getShop(id), listProducts({ shop: id, limit: 100 })])
       .then(([shopData, productsData]) => {
         if (cancelled) return;
         setShop(shopData.shop || shopData);
-        const all = productsData.products || [];
-        setProducts(
-          all.filter((product) => String(getShopId(product)) === String(id))
-        );
+        setProducts(productsData.products || []);
       })
       .catch((err) => {
         if (!cancelled) setError(err.message || 'Không tải được thông tin gian hàng.');

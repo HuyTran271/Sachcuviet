@@ -81,15 +81,10 @@ export default function MyShop() {
     queueMicrotask(() => {
       if (!cancelled) setProductsLoading(true);
     });
-    listProducts()
+    listProducts({ shop: String(shop._id || shop.id || ''), limit: 100 })
       .then((res) => {
         if (cancelled) return;
-        const shopId = String(shop._id || shop.id || '');
-        setMyProducts(
-          toArray(res).filter(
-            (p) => String(p.shop?._id ?? p.shop ?? p.shopId ?? '') === shopId
-          )
-        );
+        setMyProducts(toArray(res));
       })
       .catch((err) => {
         if (!cancelled) setError(err?.message || 'Không tải được sách của gian hàng.');

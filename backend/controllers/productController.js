@@ -20,7 +20,7 @@ const isAdmin = (req) => req.user && req.user.role === 'admin';
 // @access Public
 const listProducts = async (req, res, next) => {
     try {
-        const { q, category, minPrice, maxPrice, condition } = req.query;
+        const { q, category, minPrice, maxPrice, condition, shop } = req.query;
 
         const page = Math.max(1, parseInt(req.query.page, 10) || 1);
         const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 12));
@@ -42,6 +42,13 @@ const listProducts = async (req, res, next) => {
                 return res.status(400).json({ message: 'Danh mục không hợp lệ.' });
             }
             filter.category = category;
+        }
+
+        if (shop) {
+            if (!mongoose.Types.ObjectId.isValid(shop)) {
+                return res.status(400).json({ message: 'Gian hàng không hợp lệ.' });
+            }
+            filter.shop = shop;
         }
 
         let min = null;
