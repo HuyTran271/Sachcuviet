@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Cart from '../models/Cart.js';
 import Order from '../models/Order.js';
 import Product from '../models/Product.js';
@@ -20,12 +21,117 @@ const getMyShopIds = async (userId) => {
     return shops.map((shop) => String(shop._id));
 };
 
+// Loi co status HTTP, dung de tra 400/409... tu ben trong transaction
+// hoac buoc xu ly ma khong the res truc tiep.
+const httpError = (status, message) => {
+    const error = new Error(message);
+    error.statusCode = status;
+    return error;
+};
+
+// Phat hien 1 lan xem MongoDB co ho tro transaction khong (can replica set
+// hoac sharded cluster). Ket qua duoc cache theo process vi topology
+// khong doi khi server dang chay. Neu MongoDB la standalone thi tra false
+// va createOrder dung duong fallback (tru kho nguyen tu + boi thuong).
+let txSupportedCache;
+const transactionsSupported = () => {
+    if (txSupportedCache !== undefined) return txSupportedCache;
+    try {
+        const type = mongoose.connection?.client?.topology?.description?.type;
+        txSupportedCache =
+            type === 'ReplicaSetWithPrimary' ||
+            type === 'ReplicaSetNoPrimary' ||
+            type === 'Sharded';
+    } catch {
+        txSupportedCache = false;
+    }
+    return txSupportedCache;
+};
+
+// Tru kho nguyen tu co dieu kien: chi tru khi kho con du.
+// Tra ve document sau khi tru, hoac null neu khong du kho.
+const decrementStock = (productId, quantity, session) =>
+    Product.findOneAndUpdate(
+        { _id: productId, stock: { $gte: quantity } },
+        { $inc: { stock: -quantity } },
+        { session, new: true }
+    );
+
+// Tao don trong transaction: tru kho + tao don + xoa gio la mot khoi
+// nguyen tu, buoc nao loi thi tat ca rollback.
+const createOrderInTransaction = async (userId, orderData, checkedItems) => {
+    const session = await mongoose.startSession();
+    try {
+        let createdOrder = null;
+        await session.withTransaction(async () => {
+            for (const { product, quantity } of checkedItems) {
+                const updated = await decrementStock(product._id, quantity, session);
+                if (!updated) {
+                    throw httpError(400, `Sản phẩm "${product.name}" không đủ tồn kho.`);
+                }
+            }
+
+            createdOrder = new Order({ user: userId, ...orderData });
+            await createdOrder.save({ session });
+
+            const orderedProductIds = checkedItems.map(({ product }) => product._id);
+            await Cart.updateOne(
+                { user: userId },
+                { $pull: { items: { product: { $in: orderedProductIds } } } },
+                { session }
+            );
+        });
+        return createdOrder;
+    } finally {
+        await session.endSession();
+    }
+};
+
+// Fallback khi MongoDB la standalone (khong co transaction).
+// Tru kho nguyen tu co dieu kien van chan duoc ban vuot kho va kho am;
+// neu buoc tao don loi sau khi da tru kho thi hoan lai kho da tru.
+// Xoa gio la buoc phu: loi o day khong duoc lam hong don da tao.
+const createOrderWithCompensation = async (userId, orderData, checkedItems) => {
+    const decremented = [];
+    try {
+        for (const { product, quantity } of checkedItems) {
+            const updated = await decrementStock(product._id, quantity, undefined);
+            if (!updated) {
+                throw httpError(400, `Sản phẩm "${product.name}" không đủ tồn kho.`);
+            }
+            decremented.push({ productId: product._id, quantity });
+        }
+
+        const createdOrder = await Order.create({ user: userId, ...orderData });
+
+        try {
+            const orderedProductIds = checkedItems.map(({ product }) => product._id);
+            await Cart.updateOne(
+                { user: userId },
+                { $pull: { items: { product: { $in: orderedProductIds } } } }
+            );
+        } catch (cartError) {
+            console.error('Khong xoa duoc gio sau khi tao don:', cartError.message);
+        }
+
+        return createdOrder;
+    } catch (error) {
+        await Promise.all(
+            decremented.map(({ productId, quantity }) =>
+                Product.updateOne({ _id: productId }, { $inc: { stock: quantity } }).catch(() => {})
+            )
+        );
+        throw error;
+    }
+};
+
 // @desc  Tao don hang tu danh sach san pham
 // @method POST
 // @endpoint /api/orders
 // @access Private (protect)
-// Luu y: kiem tra het tat ca san pham TRUOC khi tao don / tru stock.
-// Neu bat ky san pham nao khong hop le thi 400 va khong tao don, khong tru stock.
+// Luu y: gop cac dong trung product truoc khi kiem tra kho; tru kho bang
+// update nguyen tu co dieu kien; tao don + tru kho + xoa gio chay trong
+// 1 transaction neu MongoDB ho tro, neu khong thi dung fallback co boi thuong.
 const createOrder = async (req, res, next) => {
     try {
         const { items, address, paymentMethod } = req.body || {};
@@ -40,8 +146,9 @@ const createOrder = async (req, res, next) => {
             return res.status(400).json({ message: 'Vui lòng cung cấp ít nhất một sản phẩm để đặt hàng.' });
         }
 
-        // Buoc 1: kiem tra tat ca san pham, chua thay doi gi ca
-        const checkedItems = [];
+        // Gop cac dong trung product: [{p, 3}, {p, 3}] thanh [{p, 6}]
+        // truoc khi kiem tra kho, de tong so luong moi la so bi kiem tra.
+        const mergedQuantities = new Map();
         for (const item of items) {
             if (!item || !item.product) {
                 return res.status(400).json({ message: 'Mỗi sản phẩm trong đơn hàng phải có id sản phẩm.' });
@@ -49,19 +156,29 @@ const createOrder = async (req, res, next) => {
             if (!Number.isInteger(item.quantity) || item.quantity < 1) {
                 return res.status(400).json({ message: 'Số lượng mỗi sản phẩm phải là số nguyên lớn hơn hoặc bằng 1.' });
             }
+            const key = String(item.product);
+            mergedQuantities.set(key, (mergedQuantities.get(key) || 0) + item.quantity);
+        }
+        const mergedItems = [...mergedQuantities.entries()].map(([product, quantity]) => ({
+            product,
+            quantity,
+        }));
 
-            const foundProduct = await Product.findById(item.product);
+        // Buoc 1: kiem tra tat ca san pham, chua thay doi gi ca
+        const checkedItems = [];
+        for (const { product: productId, quantity } of mergedItems) {
+            const foundProduct = await Product.findById(productId);
             if (!foundProduct) {
-                return res.status(404).json({ message: `Không tìm thấy sản phẩm: ${item.product}.` });
+                return res.status(404).json({ message: `Không tìm thấy sản phẩm: ${productId}.` });
             }
             if (foundProduct.status !== 'active') {
                 return res.status(400).json({ message: `Sản phẩm "${foundProduct.name}" hiện không khả dụng.` });
             }
-            if (item.quantity > foundProduct.stock) {
+            if (quantity > foundProduct.stock) {
                 return res.status(400).json({ message: `Sản phẩm "${foundProduct.name}" không đủ tồn kho (còn ${foundProduct.stock} sản phẩm).` });
             }
 
-            checkedItems.push({ product: foundProduct, quantity: item.quantity });
+            checkedItems.push({ product: foundProduct, quantity });
         }
 
         // Buoc 2: snapshot thong tin san pham vao don, tinh tong tien
@@ -74,35 +191,32 @@ const createOrder = async (req, res, next) => {
             subtotal: product.price * quantity,
         }));
         const totalPrice = orderItems.reduce((sum, item) => sum + item.subtotal, 0);
-
-        const order = await Order.create({
-            user: req.user._id,
+        const orderData = {
             items: orderItems,
             totalPrice,
             address: address.trim(),
             paymentMethod,
             paymentStatus: 'unpaid',
             status: 'pending',
-        });
+        };
 
-        // Buoc 3: tru stock tung san pham (chi chay khi don da duoc tao)
-        for (const { product, quantity } of checkedItems) {
-            product.stock -= quantity;
-            await product.save();
+        // Buoc 3: tao don + tru kho + xoa gio, nguyen tu
+        const order = transactionsSupported()
+            ? await createOrderInTransaction(req.user._id, orderData, checkedItems)
+            : await createOrderWithCompensation(req.user._id, orderData, checkedItems);
+
+        let populatedOrder;
+        try {
+            populatedOrder = await order.populate('items.product', 'name images');
+        } catch {
+            populatedOrder = order;
         }
-
-        // Buoc 4: xoa cac san pham vua dat khoi gio cua user
-        const orderedProductIds = new Set(checkedItems.map(({ product }) => String(product._id)));
-        const cart = await Cart.findOne({ user: req.user._id });
-        if (cart) {
-            cart.items = cart.items.filter((entry) => !orderedProductIds.has(String(entry.product)));
-            await cart.save();
-        }
-
-        const populatedOrder = await order.populate('items.product', 'name images');
 
         res.status(201).json(populatedOrder);
     } catch (error) {
+        if (error.statusCode) {
+            return res.status(error.statusCode).json({ message: error.message });
+        }
         next(error);
     }
 };
@@ -226,4 +340,5 @@ export {
     getOrderById,
     getSellerOrders,
     updateOrderStatus,
+    transactionsSupported,
 };
