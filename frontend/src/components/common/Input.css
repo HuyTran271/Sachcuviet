@@ -122,3 +122,14 @@
   background-color: var(--color-surface-secondary);
   cursor: not-allowed;
 }
+
+/* UI polish pass: clearer borders and readable helper text */
+.app-input-field {
+  min-height: 46px;
+  border-color: var(--color-border-strong);
+}
+
+.app-input-error,
+.app-input-helper {
+  font-size: 13px;
+}

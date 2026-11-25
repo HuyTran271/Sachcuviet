@@ -139,3 +139,26 @@
     flex: 1;
   }
 }
+
+/* UI polish pass: deliberate empty states */
+.profile-empty,
+.profile-empty-activity {
+  min-height: 180px;
+  justify-content: center;
+  padding: 40px 24px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, var(--color-surface), var(--color-primary-50));
+  box-shadow: var(--shadow-sm);
+}
+
+.profile-empty p,
+.profile-empty-activity p {
+  max-width: 52ch;
+  color: var(--color-text-secondary);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+@media (max-width: 400px) {
+  .profile-content { padding: 20px 12px 40px; }
+}

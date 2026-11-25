@@ -212,3 +212,37 @@
     padding: 4px 12px 4px 6px;
   }
 }
+
+/* UI polish pass: touch targets and focus */
+.home-nav-links {
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+
+.home-nav-links::-webkit-scrollbar { display: none; }
+
+.home-nav-link,
+.home-link-login,
+.home-sell-button {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.home-sell-button {
+  padding: 8px 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.home-sell-button:focus-visible,
+.home-nav-link:focus-visible,
+.home-link-login:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (max-width: 899px) and (min-width: 481px) {
+  .home-header-inner { padding-inline: 20px; }
+  .home-nav-links { gap: 6px; }
+  .home-nav-link { padding-inline: 12px; }
+}

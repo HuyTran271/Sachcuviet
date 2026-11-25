@@ -138,3 +138,23 @@
 .terms-has-error .checkbox-label {
   color: var(--color-error);
 }
+
+/* UI polish pass: clearer title, spacing and touch targets */
+.register-title { font-size: 30px; letter-spacing: -0.025em; }
+.register-form { gap: 20px; }
+
+.social-btn,
+.pwd-toggle-btn { min-height: 44px; }
+
+.pwd-toggle-btn {
+  min-width: 40px;
+}
+
+.pwd-toggle-btn:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  .register-title { font-size: 26px; }
+}

@@ -79,3 +79,14 @@
   color: var(--color-info);
   border-color: var(--color-info);
 }
+
+/* UI polish pass: reachable close button with clear focus */
+.alert-close-btn {
+  min-width: 40px;
+  min-height: 40px;
+}
+
+.alert-close-btn:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}

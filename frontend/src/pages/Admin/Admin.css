@@ -208,3 +208,56 @@
     overflow-x: auto;
   }
 }
+
+/* UI polish pass: consistent shell, clear select, narrow safety */
+.admin-content {
+  padding: 32px 24px 64px;
+  gap: 24px;
+}
+
+.admin-title {
+  font-size: 28px;
+  letter-spacing: -0.02em;
+}
+
+.admin-card {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-select {
+  min-height: 46px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.admin-select:focus {
+  outline: none;
+  border-color: var(--color-focus-ring);
+  box-shadow: 0 0 0 3px var(--color-primary-100);
+}
+
+.admin-category-item,
+.admin-report-item,
+.admin-product-item { min-width: 0; }
+
+.admin-product-info,
+.admin-report-info { overflow-wrap: anywhere; }
+
+@media (max-width: 800px) {
+  .admin-table { font-size: 13px; }
+  .admin-table th,
+  .admin-table td { padding: 10px 8px; }
+}
+
+@media (max-width: 400px) {
+  .admin-content { padding: 20px 12px 40px; }
+  .admin-card { padding: 16px; }
+  .admin-category-actions,
+  .admin-product-actions { width: 100%; }
+  .admin-category-actions > *,
+  .admin-product-actions > * { flex: 1; }
+  .admin-form-actions > * { flex: 1 1 100%; }
+}

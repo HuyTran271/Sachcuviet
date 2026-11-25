@@ -12,8 +12,8 @@
   /* ========================================
      BRAND — ACCENT
   ======================================== */
-  --color-accent-700: #A84F32;
-  --color-accent-600: #C06443;
+  --color-accent-700: #8F4028;
+  --color-accent-600: #A84F32;
   --color-accent-100: #F5E2D8;
   --color-accent-50: #FBF1EB;
 
@@ -28,8 +28,8 @@
   --color-border-strong: #C9C3B7;
 
   --color-text-primary: #252923;
-  --color-text-secondary: #666B63;
-  --color-text-muted: #858980;
+  --color-text-secondary: #596057;
+  --color-text-muted: #6F756D;
   --color-text-inverse: #FFFFFF;
 
   /* ========================================
@@ -73,16 +73,29 @@
   ======================================== */
   --radius-sm: 6px;
   --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
   --radius-full: 9999px;
+
+  /* ========================================
+     SPACING
+  ======================================== */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
 
   /* ========================================
      SHADOWS
   ======================================== */
-  --shadow-sm: 0 1px 3px rgb(37 41 35 / 6%);
-  --shadow-md: 0 4px 12px rgb(37 41 35 / 8%);
-  --shadow-lg: 0 10px 30px rgb(37 41 35 / 12%);
+  --shadow-sm: 0 1px 3px rgb(37 41 35 / 8%);
+  --shadow-md: 0 6px 18px rgb(37 41 35 / 10%);
+  --shadow-lg: 0 16px 40px rgb(37 41 35 / 14%);
 
   /* ========================================
      TRANSITIONS

@@ -167,3 +167,38 @@
     margin-left: 0;
   }
 }
+
+/* UI polish pass: consistent shell and empty state */
+.orders-content {
+  padding: 32px 24px 64px;
+  gap: 24px;
+}
+
+.orders-title {
+  font-size: 28px;
+  letter-spacing: -0.02em;
+}
+
+.orders-empty {
+  min-height: 180px;
+  justify-content: center;
+  padding: 40px 24px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, var(--color-surface), var(--color-primary-50));
+  box-shadow: var(--shadow-sm);
+}
+
+.orders-empty p {
+  max-width: 52ch;
+  color: var(--color-text-secondary);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+@media (max-width: 800px) {
+  .orders-table { font-size: 13px; }
+}
+
+@media (max-width: 400px) {
+  .orders-content { padding: 20px 12px 40px; }
+}

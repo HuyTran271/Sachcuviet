@@ -249,3 +249,18 @@
     display: none;
   }
 }
+
+/* UI polish pass: balanced auth card */
+.auth-form-panel { padding: 32px 20px; }
+
+.auth-form-card {
+  max-width: 500px;
+  padding: 32px;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+}
+
+@media (max-width: 480px) {
+  .auth-form-panel { padding: 20px 12px; }
+  .auth-form-card { padding: 24px 16px; border-radius: var(--radius-lg); }
+}
