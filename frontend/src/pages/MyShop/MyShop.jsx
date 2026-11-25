@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { getCurrentUser } from '../../utils/auth';
 import {
   getMyShop,
@@ -23,13 +23,14 @@ const toArray = (res) =>
 
 export default function MyShop() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [user] = useState(getCurrentUser);
   const [shop, setShop] = useState(null);
   const [checked, setChecked] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState(location.state?.error || '');
+  const [success, setSuccess] = useState(location.state?.message || '');
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');

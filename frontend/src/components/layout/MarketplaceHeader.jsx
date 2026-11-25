@@ -31,6 +31,11 @@ export default function MarketplaceHeader({ user }) {
         </nav>
 
         <div className="home-nav-actions">
+          {user && (
+            <Link to="/my-products/new" className="home-sell-button">
+              Đăng bán
+            </Link>
+          )}
           {user ? (
             <Link
               to="/profile"

@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { getCurrentUser } from '../../utils/auth';
 import {
   getProduct,
+  getMyShop,
   listCategories,
   createProduct,
   updateProduct,
@@ -37,6 +38,30 @@ export default function ProductForm() {
   const [description, setDescription] = useState('');
   const [imageFiles, setImageFiles] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
+
+  useEffect(() => {
+    if (isEdit) return;
+    let cancelled = false;
+    getMyShop()
+      .then((res) => {
+        if (cancelled) return;
+        const found = res?.shop || res?.data || res;
+        if (!found || !(found._id || found.id || found.name)) {
+          navigate('/my-shop', {
+            state: { error: 'Bạn cần tạo gian hàng trước khi đăng sách.' },
+          });
+        }
+      })
+      .catch(() => {
+        if (cancelled) return;
+        navigate('/my-shop', {
+          state: { error: 'Bạn cần tạo gian hàng trước khi đăng sách.' },
+        });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isEdit, navigate]);
 
   useEffect(() => {
     let cancelled = false;
