@@ -35,12 +35,12 @@ export function productImageUrl(path) {
   return `${API_ORIGIN}/${path}`;
 }
 
-export async function request(path, { method = 'GET', body, isForm = false } = {}) {
-  const headers = isForm ? {} : { 'Content-Type': 'application/json' };
+export async function request(path, { method = 'GET', body, isForm = false, headers = {} } = {}) {
+  const baseHeaders = isForm ? {} : { 'Content-Type': 'application/json' };
 
   const response = await fetch(`${API_BASE_URL}${path}`, {
     method,
-    headers,
+    headers: { ...baseHeaders, ...headers },
     credentials: 'include',
     body: body === undefined ? undefined : isForm ? body : JSON.stringify(body)
   });
@@ -56,7 +56,8 @@ export async function request(path, { method = 'GET', body, isForm = false } = {
 
 export const apiGet = (path) => request(path, { method: 'GET' });
 
-export const apiPost = (path, body) => request(path, { method: 'POST', body });
+export const apiPost = (path, body, options = {}) =>
+  request(path, { method: 'POST', body, ...options });
 
 export const apiPut = (path, body) => request(path, { method: 'PUT', body });
 
@@ -137,7 +138,9 @@ export const removeCartItem = (productId) =>
 // Orders
 // ---------------------------------------------------------------------------
 
-export const checkoutOrder = (payload) => apiPost('/orders', payload);
+// options co the mang headers, vi du { headers: { 'Idempotency-Key': key } }
+// de server chong tao don trung khi retry.
+export const checkoutOrder = (payload, options) => apiPost('/orders', payload, options);
 
 export const getMyOrders = () => apiGet('/orders/my');
 

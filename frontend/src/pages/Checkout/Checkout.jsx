@@ -27,6 +27,15 @@ export default function Checkout() {
   const [address, setAddress] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('COD');
 
+  // Idempotency-Key on dinh trong suot 1 lan mo trang checkout: moi lan
+  // bam "Dat hang" (ke ca bam lai sau khi mang loi) deu gui cung key,
+  // server chi tao 1 don. Mo lai trang thi sinh key moi cho lan checkout moi.
+  const [idempotencyKey] = useState(() =>
+    typeof crypto !== 'undefined' && crypto.randomUUID
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2)}`
+  );
+
   useEffect(() => {
     let cancelled = false;
     getCart()
@@ -62,14 +71,17 @@ export default function Checkout() {
     }
     setSubmitting(true);
     try {
-      await checkoutOrder({
-        items: items.map((i) => ({
-          product: getProductId(i),
-          quantity: Number(i.quantity) || 0,
-        })),
-        address: address.trim(),
-        paymentMethod,
-      });
+      await checkoutOrder(
+        {
+          items: items.map((i) => ({
+            product: getProductId(i),
+            quantity: Number(i.quantity) || 0,
+          })),
+          address: address.trim(),
+          paymentMethod,
+        },
+        { headers: { 'Idempotency-Key': idempotencyKey } }
+      );
       navigate('/orders', {
         state: { message: 'Đặt hàng thành công. Cảm ơn bạn đã mua sách tại Sách Cũ Việt!' },
       });

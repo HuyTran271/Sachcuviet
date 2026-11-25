@@ -1,8 +1,10 @@
+import crypto from 'node:crypto';
 import mongoose from 'mongoose';
 import Cart from '../models/Cart.js';
 import Order from '../models/Order.js';
 import Product from '../models/Product.js';
 import Shop from '../models/Shop.js';
+import IdempotencyKey from '../models/IdempotencyKey.js';
 
 const PAYMENT_METHODS = ['COD', 'bank_transfer'];
 
@@ -125,6 +127,21 @@ const createOrderWithCompensation = async (userId, orderData, checkedItems) => {
     }
 };
 
+// Dinh danh noi dung don de so sanh khi cung Idempotency-Key gui lai.
+// Items da gop theo product va sap xep theo id de dang chuan tac khong
+// phu thuoc thu tu client gui.
+const computeOrderFingerprint = (userId, mergedItems, address, paymentMethod) => {
+    const canonical = {
+        user: String(userId),
+        items: [...mergedItems]
+            .map(({ product, quantity }) => ({ product: String(product), quantity }))
+            .sort((a, b) => (a.product < b.product ? -1 : a.product > b.product ? 1 : 0)),
+        address,
+        paymentMethod,
+    };
+    return crypto.createHash('sha256').update(JSON.stringify(canonical)).digest('hex');
+};
+
 // @desc  Tao don hang tu danh sach san pham
 // @method POST
 // @endpoint /api/orders
@@ -200,16 +217,80 @@ const createOrder = async (req, res, next) => {
             status: 'pending',
         };
 
+        // N2: Idempotency-Key. Claim key bang unique index TRUOC khi tao don:
+        // request nao thang claim thi chay tiep, request cung key den sau
+        // gap 11000 roi xu ly theo trang thai ban ghi da co.
+        const idempotencyKey = req.headers['idempotency-key'];
+        let idempotencyRecord = null;
+        if (idempotencyKey !== undefined) {
+            if (
+                typeof idempotencyKey !== 'string' ||
+                !idempotencyKey.trim() ||
+                idempotencyKey.length > 255
+            ) {
+                return res.status(400).json({ message: 'Idempotency-Key không hợp lệ.' });
+            }
+            const fingerprint = computeOrderFingerprint(
+                req.user._id,
+                mergedItems,
+                address.trim(),
+                paymentMethod
+            );
+            try {
+                idempotencyRecord = await IdempotencyKey.create({
+                    key: idempotencyKey.trim(),
+                    user: req.user._id,
+                    fingerprint,
+                    status: 'in_progress',
+                });
+            } catch (claimError) {
+                if (claimError.code === 11000) {
+                    const existing = await IdempotencyKey.findOne({
+                        key: idempotencyKey.trim(),
+                        user: req.user._id,
+                    });
+                    if (!existing) {
+                        return res.status(409).json({ message: 'Đơn hàng đang được xử lý, vui lòng thử lại sau.' });
+                    }
+                    if (existing.fingerprint !== fingerprint) {
+                        return res.status(422).json({ message: 'Idempotency-Key đã được dùng với nội dung đơn hàng khác.' });
+                    }
+                    if (existing.status === 'completed') {
+                        return res.status(existing.responseStatus || 201).json(existing.responseBody);
+                    }
+                    return res.status(409).json({ message: 'Đơn hàng đang được xử lý, vui lòng thử lại sau.' });
+                }
+                throw claimError;
+            }
+        }
+
         // Buoc 3: tao don + tru kho + xoa gio, nguyen tu
-        const order = transactionsSupported()
-            ? await createOrderInTransaction(req.user._id, orderData, checkedItems)
-            : await createOrderWithCompensation(req.user._id, orderData, checkedItems);
+        let order;
+        try {
+            order = transactionsSupported()
+                ? await createOrderInTransaction(req.user._id, orderData, checkedItems)
+                : await createOrderWithCompensation(req.user._id, orderData, checkedItems);
+        } catch (flowError) {
+            // Don chua tao xong: xoa ban ghi claim de client retry cung key duoc.
+            if (idempotencyRecord) {
+                await IdempotencyKey.deleteOne({ _id: idempotencyRecord._id }).catch(() => {});
+            }
+            throw flowError;
+        }
 
         let populatedOrder;
         try {
             populatedOrder = await order.populate('items.product', 'name images');
         } catch {
             populatedOrder = order;
+        }
+
+        // Ghi lai response de request cung key sau nay replay dung ket qua cu.
+        if (idempotencyRecord) {
+            await IdempotencyKey.updateOne(
+                { _id: idempotencyRecord._id },
+                { status: 'completed', responseStatus: 201, responseBody: populatedOrder.toJSON() }
+            ).catch((e) => console.error('Khong luu duoc idempotency record:', e.message));
         }
 
         res.status(201).json(populatedOrder);
