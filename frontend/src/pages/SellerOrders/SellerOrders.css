@@ -1,0 +1,118 @@
+.seller-orders-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-background);
+}
+
+.seller-orders-content {
+  flex: 1;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.seller-orders-title {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.seller-orders-empty {
+  color: var(--color-text-secondary);
+}
+
+.seller-orders-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.seller-orders-item {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.seller-orders-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.seller-orders-code {
+  font-weight: 700;
+  color: var(--color-primary-900);
+}
+
+.seller-orders-date {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.seller-orders-total {
+  font-weight: 700;
+  color: var(--color-accent-600);
+}
+
+.seller-orders-buyer {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.seller-orders-items {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--color-text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.seller-orders-address {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+.seller-orders-status-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.seller-orders-select {
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  padding: 8px 10px;
+}
+
+.seller-orders-select:focus {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 1px;
+}
+
+.seller-orders-updating {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 400;
+}
