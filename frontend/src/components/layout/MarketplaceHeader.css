@@ -49,6 +49,26 @@
   white-space: nowrap;
 }
 
+.home-nav-links {
+  display: none;
+  align-items: center;
+  gap: 4px;
+}
+
+.home-nav-link {
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.home-nav-link:hover {
+  color: var(--color-link-hover);
+  background-color: var(--color-surface-secondary);
+}
+
 .home-nav-actions,
 .home-auth-links {
   display: flex;
@@ -153,6 +173,12 @@
   .home-link-login {
     padding: 8px 12px;
     font-size: 14.5px;
+  }
+}
+
+@media (min-width: 900px) {
+  .home-nav-links {
+    display: flex;
   }
 }
 

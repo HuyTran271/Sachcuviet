@@ -35,6 +35,11 @@ const ProductSchema = new mongoose.Schema({
         type: String,
         required: true
     }],
+    author: {
+        type: String,
+        trim: true,
+        default: ''
+    },
     condition: {
         type: String,
         enum: ['new', 'used'],

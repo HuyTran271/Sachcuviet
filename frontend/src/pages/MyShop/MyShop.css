@@ -1,0 +1,175 @@
+.myshop-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-background);
+}
+
+.myshop-content {
+  flex: 1;
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.myshop-title {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.myshop-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 20px;
+}
+
+.myshop-card h2 {
+  margin: 0 0 16px;
+  color: var(--color-primary-900);
+  font-size: 18px;
+}
+
+.myshop-avatar {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  margin-bottom: 16px;
+  display: block;
+}
+
+.myshop-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.myshop-label {
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.myshop-label span {
+  color: var(--color-error);
+}
+
+.myshop-textarea {
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  padding: 10px 12px;
+  resize: vertical;
+}
+
+.myshop-textarea:focus {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 1px;
+}
+
+.myshop-file {
+  color: var(--color-text-secondary);
+}
+
+.myshop-file-name {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.myshop-books-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.myshop-books-head h2 {
+  margin-bottom: 0;
+}
+
+.myshop-empty {
+  color: var(--color-text-secondary);
+}
+
+.myshop-hint {
+  color: var(--color-text-secondary);
+}
+
+.myshop-book-list {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.myshop-book-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  background-color: var(--color-surface);
+}
+
+.myshop-book-cover {
+  width: 64px;
+  height: 84px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.myshop-book-cover--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  background-color: var(--color-surface-secondary);
+}
+
+.myshop-book-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.myshop-book-meta {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.myshop-book-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .myshop-book-item {
+    flex-wrap: wrap;
+  }
+
+  .myshop-book-actions {
+    width: 100%;
+  }
+}
