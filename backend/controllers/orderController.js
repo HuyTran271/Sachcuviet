@@ -1,0 +1,229 @@
+import Cart from '../models/Cart.js';
+import Order from '../models/Order.js';
+import Product from '../models/Product.js';
+import Shop from '../models/Shop.js';
+
+const PAYMENT_METHODS = ['COD', 'bank_transfer'];
+
+// Thu tu chuyen trang thai hop le
+const ALLOWED_TRANSITIONS = {
+    pending: ['confirmed', 'cancelled'],
+    confirmed: ['shipping', 'cancelled'],
+    shipping: ['delivered'],
+    delivered: [],
+    cancelled: [],
+};
+
+// Lay id cac shop ma user dang dang nhap dang so huu
+const getMyShopIds = async (userId) => {
+    const shops = await Shop.find({ owner: userId }).select('_id');
+    return shops.map((shop) => String(shop._id));
+};
+
+// @desc  Tao don hang tu danh sach san pham
+// @method POST
+// @endpoint /api/orders
+// @access Private (protect)
+// Luu y: kiem tra het tat ca san pham TRUOC khi tao don / tru stock.
+// Neu bat ky san pham nao khong hop le thi 400 va khong tao don, khong tru stock.
+const createOrder = async (req, res, next) => {
+    try {
+        const { items, address, paymentMethod } = req.body || {};
+
+        if (!address || typeof address !== 'string' || !address.trim()) {
+            return res.status(400).json({ message: 'Vui lòng cung cấp địa chỉ giao hàng.' });
+        }
+        if (!paymentMethod || !PAYMENT_METHODS.includes(paymentMethod)) {
+            return res.status(400).json({ message: 'Phương thức thanh toán phải là COD hoặc bank_transfer.' });
+        }
+        if (!Array.isArray(items) || items.length === 0) {
+            return res.status(400).json({ message: 'Vui lòng cung cấp ít nhất một sản phẩm để đặt hàng.' });
+        }
+
+        // Buoc 1: kiem tra tat ca san pham, chua thay doi gi ca
+        const checkedItems = [];
+        for (const item of items) {
+            if (!item || !item.product) {
+                return res.status(400).json({ message: 'Mỗi sản phẩm trong đơn hàng phải có id sản phẩm.' });
+            }
+            if (!Number.isInteger(item.quantity) || item.quantity < 1) {
+                return res.status(400).json({ message: 'Số lượng mỗi sản phẩm phải là số nguyên lớn hơn hoặc bằng 1.' });
+            }
+
+            const foundProduct = await Product.findById(item.product);
+            if (!foundProduct) {
+                return res.status(404).json({ message: `Không tìm thấy sản phẩm: ${item.product}.` });
+            }
+            if (foundProduct.status !== 'active') {
+                return res.status(400).json({ message: `Sản phẩm "${foundProduct.name}" hiện không khả dụng.` });
+            }
+            if (item.quantity > foundProduct.stock) {
+                return res.status(400).json({ message: `Sản phẩm "${foundProduct.name}" không đủ tồn kho (còn ${foundProduct.stock} sản phẩm).` });
+            }
+
+            checkedItems.push({ product: foundProduct, quantity: item.quantity });
+        }
+
+        // Buoc 2: snapshot thong tin san pham vao don, tinh tong tien
+        const orderItems = checkedItems.map(({ product, quantity }) => ({
+            product: product._id,
+            shop: product.shop,
+            productName: product.name,
+            price: product.price,
+            quantity,
+            subtotal: product.price * quantity,
+        }));
+        const totalPrice = orderItems.reduce((sum, item) => sum + item.subtotal, 0);
+
+        const order = await Order.create({
+            user: req.user._id,
+            items: orderItems,
+            totalPrice,
+            address: address.trim(),
+            paymentMethod,
+            paymentStatus: 'unpaid',
+            status: 'pending',
+        });
+
+        // Buoc 3: tru stock tung san pham (chi chay khi don da duoc tao)
+        for (const { product, quantity } of checkedItems) {
+            product.stock -= quantity;
+            await product.save();
+        }
+
+        // Buoc 4: xoa cac san pham vua dat khoi gio cua user
+        const orderedProductIds = new Set(checkedItems.map(({ product }) => String(product._id)));
+        const cart = await Cart.findOne({ user: req.user._id });
+        if (cart) {
+            cart.items = cart.items.filter((entry) => !orderedProductIds.has(String(entry.product)));
+            await cart.save();
+        }
+
+        const populatedOrder = await order.populate('items.product', 'name images');
+
+        res.status(201).json(populatedOrder);
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc  Lay cac don hang cua minh (moi nhat truoc)
+// @method GET
+// @endpoint /api/orders/my
+// @access Private (protect)
+const getMyOrders = async (req, res, next) => {
+    try {
+        const orders = await Order.find({ user: req.user._id })
+            .sort({ createdAt: -1 })
+            .populate('items.product', 'name images');
+        res.json(orders);
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc  Lay chi tiet mot don hang
+// @method GET
+// @endpoint /api/orders/:id
+// @access Private (protect) - chi chu don, seller co shop trong don, hoac admin
+const getOrderById = async (req, res, next) => {
+    try {
+        const order = await Order.findById(req.params.id)
+            .populate('user', 'name email')
+            .populate('items.product', 'name images');
+
+        if (!order) {
+            return res.status(404).json({ message: 'Không tìm thấy đơn hàng.' });
+        }
+
+        const isOwner = String(order.user._id || order.user) === String(req.user._id);
+        const isAdmin = req.user.role === 'admin';
+        let isSeller = false;
+        if (!isOwner && !isAdmin) {
+            const myShopIds = await getMyShopIds(req.user._id);
+            isSeller = order.items.some((item) => myShopIds.includes(String(item.shop)));
+        }
+
+        if (!isOwner && !isAdmin && !isSeller) {
+            return res.status(403).json({ message: 'Bạn không có quyền xem đơn hàng này.' });
+        }
+
+        res.json(order);
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc  Lay cac don hang co san pham thuoc shop cua minh
+// @method GET
+// @endpoint /api/orders/seller
+// @access Private (protect)
+const getSellerOrders = async (req, res, next) => {
+    try {
+        const myShopIds = await getMyShopIds(req.user._id);
+        if (myShopIds.length === 0) {
+            return res.json([]);
+        }
+
+        const orders = await Order.find({ 'items.shop': { $in: myShopIds } })
+            .sort({ createdAt: -1 })
+            .populate('user', 'name email')
+            .populate('items.product', 'name images price');
+        res.json(orders);
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc  Cap nhat trang thai don hang
+// @method PUT
+// @endpoint /api/orders/:id/status
+// @access Private (protect) - seller chi duoc doi don co shop cua minh, admin duoc doi moi don
+// Thu tu hop le: pending -> confirmed -> shipping -> delivered,
+// hoac pending/confirmed -> cancelled. Chuyen nguoc hoac tu delivered/cancelled thi 400.
+const updateOrderStatus = async (req, res, next) => {
+    try {
+        const { status } = req.body || {};
+
+        if (!status || !Object.keys(ALLOWED_TRANSITIONS).includes(status)) {
+            return res.status(400).json({ message: 'Trạng thái không hợp lệ (pending, confirmed, shipping, delivered, cancelled).' });
+        }
+
+        const order = await Order.findById(req.params.id);
+        if (!order) {
+            return res.status(404).json({ message: 'Không tìm thấy đơn hàng.' });
+        }
+
+        const isAdmin = req.user.role === 'admin';
+        if (!isAdmin) {
+            const myShopIds = await getMyShopIds(req.user._id);
+            const hasMyShop = order.items.some((item) => myShopIds.includes(String(item.shop)));
+            if (!hasMyShop) {
+                return res.status(403).json({ message: 'Bạn không có quyền cập nhật đơn hàng này.' });
+            }
+        }
+
+        const allowedNext = ALLOWED_TRANSITIONS[order.status] || [];
+        if (!allowedNext.includes(status)) {
+            return res.status(400).json({
+                message: `Không thể chuyển đơn hàng từ "${order.status}" sang "${status}". Trạng thái tiếp theo hợp lệ: ${allowedNext.length > 0 ? allowedNext.join(', ') : 'không còn trạng thái nào'}.`,
+            });
+        }
+
+        order.status = status;
+        await order.save();
+
+        const updatedOrder = await order.populate('items.product', 'name images');
+        res.json(updatedOrder);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export {
+    createOrder,
+    getMyOrders,
+    getOrderById,
+    getSellerOrders,
+    updateOrderStatus,
+};
