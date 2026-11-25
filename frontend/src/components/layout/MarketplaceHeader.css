@@ -246,3 +246,79 @@
   .home-nav-links { gap: 6px; }
   .home-nav-link { padding-inline: 12px; }
 }
+
+/* Header upgrade: one row like bookstore sites, cart next to user */
+.home-header-inner {
+  flex-wrap: nowrap;
+  max-width: 1240px;
+}
+
+.home-logo { flex-shrink: 0; }
+
+.home-nav-links {
+  order: 0;
+  flex-basis: auto;
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+.home-nav-actions {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.home-cart-link {
+  position: relative;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.home-cart-link:hover {
+  color: var(--color-link-hover);
+  background-color: var(--color-surface-secondary);
+}
+
+.home-cart-link:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.home-cart-badge {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background-color: var(--color-accent-600);
+  color: var(--color-text-inverse);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+@media (max-width: 700px) {
+  .home-cart-label { display: none; }
+  .home-logo-title { font-size: 15px; }
+  .home-sell-button { padding: 8px 10px; font-size: 13px; }
+}
+
+@media (max-width: 420px) {
+  .home-nav-links { display: none; }
+}
+
+/* Header fix: keep nav text whole on medium windows */
+@media (max-width: 900px) {
+  .user-details { display: none; }
+  .home-user-badge { padding: 4px; }
+  .home-nav-link { padding-inline: 8px; }
+  .home-nav-links { gap: 2px; }
+}

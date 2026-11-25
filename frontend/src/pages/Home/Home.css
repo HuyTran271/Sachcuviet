@@ -368,3 +368,37 @@
   .home-product-name { font-size: 14px; }
   .home-product-price { font-size: 15px; }
 }
+
+/* Category chips like bookstore sites */
+.home-category-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.home-category-chip {
+  min-height: 40px;
+  padding: 8px 16px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.home-category-chip:hover {
+  border-color: var(--color-primary-100);
+  background-color: var(--color-primary-50);
+}
+
+.home-category-chip.is-active {
+  border-color: var(--color-primary-700);
+  background-color: var(--color-primary-700);
+  color: var(--color-text-inverse);
+}
+
+.home-category-chip:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}

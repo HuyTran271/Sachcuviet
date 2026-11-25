@@ -102,6 +102,13 @@ export default function Home() {
     setNotice('');
   };
 
+  const handleCategoryChip = (categoryId) => {
+    setNotice('');
+    setDraftFilters((prev) => ({ ...prev, category: categoryId }));
+    setAppliedFilters((prev) => ({ ...prev, category: categoryId }));
+    setPage(1);
+  };
+
   const handleAddToCart = async (event, product) => {
     event.stopPropagation();
     setNotice('');
@@ -122,6 +129,26 @@ export default function Home() {
         <div className="home-content">
           <h1 className="home-title">Khám phá sách cũ</h1>
           <p className="home-subtitle">Tìm cuốn sách bạn cần từ các gian hàng trên Sách Cũ Việt.</p>
+
+          <div className="home-category-chips" aria-label="Danh mục sách">
+            <button
+              type="button"
+              className={`home-category-chip${appliedFilters.category === '' ? ' is-active' : ''}`}
+              onClick={() => handleCategoryChip('')}
+            >
+              Tất cả sách
+            </button>
+            {categories.map((category) => (
+              <button
+                key={category._id}
+                type="button"
+                className={`home-category-chip${appliedFilters.category === category._id ? ' is-active' : ''}`}
+                onClick={() => handleCategoryChip(category._id)}
+              >
+                {category.name}
+              </button>
+            ))}
+          </div>
 
           <form className="home-filters" onSubmit={handleSearch}>
             <Input

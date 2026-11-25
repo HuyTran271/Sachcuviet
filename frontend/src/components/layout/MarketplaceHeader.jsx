@@ -1,8 +1,32 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../common/Button';
+import { getCart } from '../../utils/api';
 import './MarketplaceHeader.css';
 
+const toCartItems = (res) =>
+  Array.isArray(res) ? res : res?.items || res?.cart?.items || res?.data?.items || [];
+
 export default function MarketplaceHeader({ user }) {
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    getCart()
+      .then((res) => {
+        if (cancelled) return;
+        const items = toCartItems(res);
+        setCartCount(items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0));
+      })
+      .catch(() => {
+        if (!cancelled) setCartCount(0);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
   return (
     <header className="home-header">
       <div className="home-header-inner">
@@ -17,24 +41,28 @@ export default function MarketplaceHeader({ user }) {
         </Link>
 
         <nav className="home-nav-links" aria-label="Điều hướng chính">
+          <Link to="/" className="home-nav-link">Trang chủ</Link>
           {user && (
-            <>
-              <Link to="/cart" className="home-nav-link">Giỏ hàng</Link>
-              <Link to="/orders" className="home-nav-link">Đơn hàng</Link>
-              <Link to="/my-shop" className="home-nav-link">Gian hàng</Link>
-              <Link to="/seller-orders" className="home-nav-link">Đơn bán</Link>
-              {user.role === 'admin' && (
-                <Link to="/admin" className="home-nav-link">Quản trị</Link>
-              )}
-            </>
+            <Link to="/profile" className="home-nav-link">Hồ sơ</Link>
           )}
         </nav>
 
         <div className="home-nav-actions">
           {user && (
-            <Link to="/my-products/new" className="home-sell-button">
-              Đăng bán
-            </Link>
+            <>
+              <Link to="/my-products/new" className="home-sell-button">
+                Đăng bán
+              </Link>
+              <Link to="/cart" className="home-cart-link" aria-label="Giỏ hàng">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="9" cy="21" r="1" />
+                  <circle cx="20" cy="21" r="1" />
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                </svg>
+                <span className="home-cart-label">Giỏ hàng</span>
+                {cartCount > 0 && <span className="home-cart-badge">{cartCount}</span>}
+              </Link>
+            </>
           )}
           {user ? (
             <Link
