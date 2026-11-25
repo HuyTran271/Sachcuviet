@@ -56,7 +56,7 @@ const decrementStock = (productId, quantity, session) =>
     Product.findOneAndUpdate(
         { _id: productId, stock: { $gte: quantity } },
         { $inc: { stock: -quantity } },
-        { session, new: true }
+        { session, returnDocument: 'after' }
     );
 
 // Tao don trong transaction: tru kho + tao don + xoa gio la mot khoi
