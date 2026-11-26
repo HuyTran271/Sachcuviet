@@ -370,6 +370,70 @@ const getSellerOrders = async (req, res, next) => {
     }
 };
 
+// Huy don va hoan kho mot lan duy nhat. Claim chuyen trang thai bang
+// dieu kien status cu de hai request huy dong thoi khong cung hoan kho.
+const cancelOrderWithStockRestore = async (order, previousStatus) => {
+    const restoreStock = async (session) => {
+        for (const item of order.items) {
+            await Product.updateOne(
+                { _id: item.product },
+                { $inc: { stock: item.quantity } },
+                { session }
+            );
+        }
+    };
+
+    if (transactionsSupported()) {
+        const session = await mongoose.startSession();
+        try {
+            let claimedOrder = null;
+            await session.withTransaction(async () => {
+                claimedOrder = await Order.findOneAndUpdate(
+                    { _id: order._id, status: previousStatus },
+                    { $set: { status: 'cancelled' } },
+                    { session, returnDocument: 'after' }
+                );
+                if (!claimedOrder) {
+                    throw httpError(409, 'Đơn hàng đã thay đổi trạng thái, vui lòng tải lại.');
+                }
+                await restoreStock(session);
+            });
+            return claimedOrder;
+        } finally {
+            await session.endSession();
+        }
+    }
+
+    const claimedOrder = await Order.findOneAndUpdate(
+        { _id: order._id, status: previousStatus },
+        { $set: { status: 'cancelled' } },
+        { returnDocument: 'after' }
+    );
+    if (!claimedOrder) {
+        throw httpError(409, 'Đơn hàng đã thay đổi trạng thái, vui lòng tải lại.');
+    }
+
+    const restored = [];
+    try {
+        for (const item of order.items) {
+            await Product.updateOne({ _id: item.product }, { $inc: { stock: item.quantity } });
+            restored.push(item);
+        }
+        return claimedOrder;
+    } catch (error) {
+        await Promise.all(
+            restored.map((item) =>
+                Product.updateOne({ _id: item.product }, { $inc: { stock: -item.quantity } }).catch(() => {})
+            )
+        );
+        await Order.updateOne(
+            { _id: order._id, status: 'cancelled' },
+            { $set: { status: previousStatus } }
+        ).catch(() => {});
+        throw error;
+    }
+};
+
 // @desc  Cap nhat trang thai don hang
 // @method PUT
 // @endpoint /api/orders/:id/status
@@ -405,12 +469,20 @@ const updateOrderStatus = async (req, res, next) => {
             });
         }
 
-        order.status = status;
-        await order.save();
+        const updatedOrder = status === 'cancelled'
+            ? await cancelOrderWithStockRestore(order, order.status)
+            : await Order.findByIdAndUpdate(
+                order._id,
+                { $set: { status } },
+                { returnDocument: 'after' }
+            );
 
-        const updatedOrder = await order.populate('items.product', 'name images');
-        res.json(updatedOrder);
+        const populatedOrder = await updatedOrder.populate('items.product', 'name images');
+        res.json(populatedOrder);
     } catch (error) {
+        if (error.statusCode) {
+            return res.status(error.statusCode).json({ message: error.message });
+        }
         next(error);
     }
 };

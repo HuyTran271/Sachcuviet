@@ -160,3 +160,31 @@ describe('N2: Idempotency-Key cho POST /orders', () => {
         expect(await Order.countDocuments()).toBe(2);
     });
 });
+
+describe('Huy don hoan kho', () => {
+    it('huy don thi cong lai kho, huy lan hai khong cong lai', async () => {
+        const product = await makeProduct({ shop: ctx.shop, category: ctx.category, stock: 5 });
+
+        const created = await request(app)
+            .post('/api/orders')
+            .set('Cookie', authCookie(ctx.buyer))
+            .send(orderPayload([{ product: String(product._id), quantity: 2 }]));
+        expect(created.status).toBe(201);
+        expect((await Product.findById(product._id)).stock).toBe(3);
+
+        const cancelled = await request(app)
+            .put(`/api/orders/${created.body._id}/status`)
+            .set('Cookie', authCookie(ctx.seller))
+            .send({ status: 'cancelled' });
+        expect(cancelled.status).toBe(200);
+        expect(cancelled.body.status).toBe('cancelled');
+        expect((await Product.findById(product._id)).stock).toBe(5);
+
+        const cancelledAgain = await request(app)
+            .put(`/api/orders/${created.body._id}/status`)
+            .set('Cookie', authCookie(ctx.seller))
+            .send({ status: 'cancelled' });
+        expect(cancelledAgain.status).toBe(400);
+        expect((await Product.findById(product._id)).stock).toBe(5);
+    });
+});
