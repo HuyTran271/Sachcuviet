@@ -103,6 +103,32 @@
   border: 1px solid var(--color-border);
 }
 
+.product-form-previews {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.product-form-preview {
+  position: relative;
+}
+
+.product-form-preview-remove {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background-color: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
 .product-form-actions {
   display: flex;
   gap: 12px;

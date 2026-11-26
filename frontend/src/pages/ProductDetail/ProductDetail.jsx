@@ -30,6 +30,7 @@ export default function ProductDetail() {
   const [user] = useState(getCurrentUser);
 
   const [product, setProduct] = useState(null);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -48,6 +49,7 @@ export default function ProductDetail() {
       if (!cancelled) {
         setLoading(true);
         setError('');
+        setActiveImageIndex(0);
       }
     });
     getProduct(id)
@@ -117,7 +119,9 @@ export default function ProductDetail() {
     }
   };
 
-  const mainImage = productImageUrl(product?.images?.[0]);
+  const mainImage = productImageUrl(
+    product?.images?.[activeImageIndex] ?? product?.images?.[0],
+  );
 
   return (
     <div className="product-detail-container">
@@ -145,12 +149,22 @@ export default function ProductDetail() {
                 {product.images?.length > 1 && (
                   <div className="product-detail-thumbnails">
                     {product.images.map((image, index) => (
-                      <img
+                      <button
                         key={`${image}-${index}`}
-                        src={productImageUrl(image)}
-                        alt={`${product.name} - ảnh ${index + 1}`}
-                        className="product-detail-thumbnail"
-                      />
+                        type="button"
+                        className={`product-detail-thumbnail-button${
+                          index === activeImageIndex ? ' active' : ''
+                        }`}
+                        onClick={() => setActiveImageIndex(index)}
+                        aria-label={`Xem ảnh ${index + 1}`}
+                        aria-pressed={index === activeImageIndex}
+                      >
+                        <img
+                          src={productImageUrl(image)}
+                          alt={`${product.name} - ảnh ${index + 1}`}
+                          className="product-detail-thumbnail"
+                        />
+                      </button>
                     ))}
                   </div>
                 )}
