@@ -73,6 +73,21 @@
   object-fit: cover;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
+  display: block;
+}
+
+.product-detail-thumbnail-button {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+}
+
+.product-detail-thumbnail-button.active .product-detail-thumbnail {
+  border-color: var(--color-primary, var(--color-text-secondary));
+  outline: 2px solid var(--color-primary, var(--color-text-secondary));
+  outline-offset: 1px;
 }
 
 .product-detail-info {

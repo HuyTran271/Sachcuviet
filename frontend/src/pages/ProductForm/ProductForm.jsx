@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getCurrentUser } from '../../utils/auth';
 import {
@@ -17,6 +17,9 @@ import './ProductForm.css';
 
 const toArray = (res) =>
   Array.isArray(res) ? res : res?.categories || res?.data || res?.items || [];
+
+// Backend nhan toi da 5 anh moi lan gui (upload.array('images', 5)).
+const MAX_IMAGES = 5;
 
 export default function ProductForm() {
   const navigate = useNavigate();
@@ -37,7 +40,41 @@ export default function ProductForm() {
   const [condition, setCondition] = useState('used');
   const [description, setDescription] = useState('');
   const [imageFiles, setImageFiles] = useState([]);
+  const [imageMessage, setImageMessage] = useState('');
   const [existingImages, setExistingImages] = useState([]);
+
+  // URL xem truoc cho tung file da chon; thu hoi khi danh sach thay doi.
+  const imagePreviews = useMemo(
+    () => imageFiles.map((file) => URL.createObjectURL(file)),
+    [imageFiles],
+  );
+  useEffect(
+    () => () => imagePreviews.forEach((url) => URL.revokeObjectURL(url)),
+    [imagePreviews],
+  );
+
+  // Cong don anh qua nhieu lan chon, toi da MAX_IMAGES anh.
+  const handleImageChange = (e) => {
+    const picked = Array.from(e.target.files || []);
+    e.target.value = '';
+    if (picked.length === 0) return;
+    setImageFiles((prev) => {
+      const merged = [...prev, ...picked];
+      if (merged.length > MAX_IMAGES) {
+        setImageMessage(
+          `Tối đa ${MAX_IMAGES} ảnh, ${merged.length - MAX_IMAGES} ảnh vượt quá đã bị bỏ qua.`,
+        );
+        return merged.slice(0, MAX_IMAGES);
+      }
+      setImageMessage('');
+      return merged;
+    });
+  };
+
+  const removeImageFile = (index) => {
+    setImageFiles((prev) => prev.filter((_, i) => i !== index));
+    setImageMessage('');
+  };
 
   useEffect(() => {
     if (isEdit) return;
@@ -285,13 +322,39 @@ export default function ProductForm() {
                 type="file"
                 accept="image/*"
                 multiple
-                onChange={(e) => setImageFiles(Array.from(e.target.files || []))}
+                onChange={handleImageChange}
                 className="product-form-file"
               />
+              <p className="product-form-file-name">
+                Đã chọn {imageFiles.length}/{MAX_IMAGES} ảnh. Có thể bấm chọn
+                nhiều lần để cộng dồn, ảnh đầu tiên là ảnh bìa.
+              </p>
+              {imageMessage && (
+                <p className="product-form-file-name">{imageMessage}</p>
+              )}
               {imageFiles.length > 0 && (
-                <p className="product-form-file-name">
-                  Đã chọn {imageFiles.length} ảnh: {imageFiles.map((f) => f.name).join(', ')}
-                </p>
+                <div className="product-form-previews">
+                  {imageFiles.map((file, i) => (
+                    <div
+                      key={`${file.name}-${file.size}-${i}`}
+                      className="product-form-preview"
+                    >
+                      <img
+                        src={imagePreviews[i]}
+                        alt={`Ảnh đã chọn ${i + 1}: ${file.name}`}
+                        className="product-form-thumb"
+                      />
+                      <button
+                        type="button"
+                        className="product-form-preview-remove"
+                        onClick={() => removeImageFile(i)}
+                        aria-label={`Xóa ảnh ${file.name}`}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
               )}
               {isEdit && existingImages.length > 0 && (
                 <div className="product-form-existing">
