@@ -30,6 +30,9 @@ Biến môi trường (xem `backend/.env.example`, **không commit file `.env`**
 | `MONGODB_URL` | Chuỗi kết nối MongoDB |
 | `JWT_SECRET` | Secret ký JWT, bắt buộc, không có giá trị mặc định. Thiếu thì server từ chối khởi động |
 | `FRONTEND_URL` | Origin frontend cho CORS, mặc định `http://localhost:5173` |
+| `CLOUDINARY_CLOUD_NAME` | Cloud name của Cloudinary |
+| `CLOUDINARY_API_KEY` | API key của Cloudinary |
+| `CLOUDINARY_API_SECRET` | API secret của Cloudinary |
 | `SEED_ADMIN_EMAIL` | Email admin seed |
 | `SEED_ADMIN_PASSWORD` | Mật khẩu admin seed (truyền mật khẩu gốc, hook của User sẽ hash 1 lần) |
 
@@ -50,8 +53,10 @@ npm run lint      # ESLint, phải sạch trước khi commit
 API base mặc định `http://localhost:3003/api`, đổi bằng biến
 `VITE_API_BASE_URL` trong file `.env` của frontend (không bắt buộc).
 
-Ảnh sản phẩm/avatar upload lên backend, lưu local ở `backend/uploads/`
-và phục vụ ở `/uploads/...`. Thư mục này đã ignore trong git.
+Ảnh sản phẩm/avatar được kiểm tra định dạng rồi upload lên Cloudinary (folder
+`sachcuviet`); URL `secure_url` được lưu vào database. Cần khai báo đủ ba biến
+Cloudinary trong `backend/.env` hoặc cung cấp `CLOUDINARY_URL`. Các ảnh local
+cũ ở `/uploads/...` vẫn được phục vụ để không làm hỏng dữ liệu hiện có.
 
 ## Cấu trúc
 
@@ -63,7 +68,7 @@ backend/
   models/                 # User, Shop, Category, Product, Cart, Order, Review, Report
   routes/                 # auth, users, shops, categories, products, cart, orders, admin, reports
   utils/generateToken.js  # ký JWT + set cookie (1 chỗ duy nhất)
-  utils/upload.js         # multer: ảnh local, tối đa 5 MB/file, 5 ảnh/sản phẩm
+  utils/upload.js         # multer + xác thực ảnh + Cloudinary, tối đa 5 MB/file
   seeder.js               # tạo admin seed từ env
   server.js               # mount route + static /uploads
 frontend/src/

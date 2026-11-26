@@ -155,7 +155,7 @@ const createProduct = async (req, res, next) => {
             return res.status(404).json({ message: 'Không tìm thấy danh mục.' });
         }
 
-        const uploadedImages = (req.files || []).map((file) => `/uploads/${file.filename}`);
+        const uploadedImages = (req.files || []).map((file) => file.cloudinaryUrl || `/uploads/${file.filename}`);
         const images = [...uploadedImages, ...collectBodyImages(req.body)];
 
         const product = await Product.create({
@@ -253,7 +253,7 @@ const updateProduct = async (req, res, next) => {
             product.author = author.trim();
         }
 
-        const uploadedImages = (req.files || []).map((file) => `/uploads/${file.filename}`);
+        const uploadedImages = (req.files || []).map((file) => file.cloudinaryUrl || `/uploads/${file.filename}`);
         const bodyImages = collectBodyImages(req.body);
         if (uploadedImages.length > 0 || bodyImages.length > 0) {
             product.images = [...uploadedImages, ...bodyImages];

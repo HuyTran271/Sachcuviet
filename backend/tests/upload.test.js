@@ -1,8 +1,18 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, vi } from 'vitest';
 import request from 'supertest';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+const cloudinaryMock = vi.hoisted(() => ({
+    config: vi.fn(),
+    uploader: {
+        upload: vi.fn(),
+        destroy: vi.fn()
+    }
+}));
+vi.mock('cloudinary', () => ({ v2: cloudinaryMock }));
+
+import { v2 as cloudinary } from 'cloudinary';
 import Product from '../models/Product.js';
 import app from '../app.js';
 import { startTestDb, stopTestDb, seedUsers, authCookie } from './helpers.js';
@@ -68,6 +78,39 @@ const createProductWithImage = (fileBuffer, filename, mimetype) =>
         .attach('images', fileBuffer, { filename, contentType: mimetype });
 
 describe('C1: upload anh chong stored XSS', () => {
+    it('upload anh hop le len Cloudinary va luu secure_url', async () => {
+        const cloudinaryEnv = {
+            CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
+            CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
+            CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET
+        };
+        process.env.CLOUDINARY_CLOUD_NAME = 'test-cloud';
+        process.env.CLOUDINARY_API_KEY = 'test-key';
+        process.env.CLOUDINARY_API_SECRET = 'test-secret';
+        cloudinary.uploader.upload.mockResolvedValue({
+            secure_url: 'https://res.cloudinary.com/test-cloud/image/upload/sachcuviet/test.png',
+            public_id: 'sachcuviet/test'
+        });
+
+        try {
+            const res = await createProductWithImage(realPng, 'anh.png', 'image/png');
+            expect(res.status).toBe(201);
+            expect(res.body.product.images).toEqual([
+                'https://res.cloudinary.com/test-cloud/image/upload/sachcuviet/test.png'
+            ]);
+            expect(cloudinary.uploader.upload).toHaveBeenCalledWith(
+                expect.any(String),
+                expect.objectContaining({ folder: 'sachcuviet', resource_type: 'image' })
+            );
+        } finally {
+            for (const [key, value] of Object.entries(cloudinaryEnv)) {
+                if (value === undefined) delete process.env[key];
+                else process.env[key] = value;
+            }
+            cloudinary.uploader.upload.mockReset();
+        }
+    });
+
     it('anh PNG that duoc chap nhan, phuc vu kem CSP sandbox', async () => {
         const res = await createProductWithImage(realPng, 'anh.png', 'image/png');
         expect(res.status).toBe(201);

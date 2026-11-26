@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { fileTypeFromFile } from 'file-type';
+import { v2 as cloudinary } from 'cloudinary';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const uploadsDir = path.join(__dirname, '..', 'uploads');
@@ -96,5 +97,87 @@ const validateUploadedImages = async (req, res, next) => {
     return next();
 };
 
-export { upload, uploadProductImages, uploadAvatar, validateUploadedImages };
+const uploadedFiles = (req) => [...(req.files || []), ...(req.file ? [req.file] : [])];
+
+const removeTemporaryFiles = async (files) =>
+    Promise.all(files.map((file) => fs.promises.rm(file.path, { force: true })));
+
+const hasCloudinaryConfig = () =>
+    Boolean(
+        process.env.CLOUDINARY_URL ||
+        (process.env.CLOUDINARY_CLOUD_NAME &&
+            process.env.CLOUDINARY_API_KEY &&
+            process.env.CLOUDINARY_API_SECRET)
+    );
+
+const configureCloudinary = () => {
+    if (process.env.CLOUDINARY_URL) {
+        cloudinary.config();
+        return;
+    }
+
+    cloudinary.config({
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET,
+        secure: true
+    });
+};
+
+const storeUploadedImages = async (req, res, next) => {
+    const files = uploadedFiles(req);
+    if (files.length === 0) return next();
+
+    // Test mode keeps exercising the local static-file behavior without needing
+    // real Cloudinary credentials or making network requests.
+    if (process.env.NODE_ENV === 'test' && !hasCloudinaryConfig()) return next();
+
+    if (!hasCloudinaryConfig()) {
+        await removeTemporaryFiles(files);
+        const error = new Error(
+            'Thiếu cấu hình Cloudinary. Vui lòng khai báo CLOUDINARY_URL hoặc CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY và CLOUDINARY_API_SECRET.'
+        );
+        error.statusCode = 503;
+        return next(error);
+    }
+
+    const uploaded = [];
+    try {
+        configureCloudinary();
+        for (const file of files) {
+            const result = await cloudinary.uploader.upload(file.path, {
+                folder: 'sachcuviet',
+                resource_type: 'image'
+            });
+            if (result.public_id) uploaded.push(result.public_id);
+            if (!result.secure_url || !result.public_id) {
+                throw new Error('Cloudinary không trả về URL ảnh hợp lệ.');
+            }
+            file.cloudinaryUrl = result.secure_url;
+            file.cloudinaryPublicId = result.public_id;
+        }
+
+        await removeTemporaryFiles(files);
+        return next();
+    } catch (error) {
+        const cleanupResults = await Promise.allSettled([
+            ...uploaded.map((publicId) => cloudinary.uploader.destroy(publicId)),
+            removeTemporaryFiles(files)
+        ]);
+        for (const result of cleanupResults) {
+            if (result.status === 'rejected') {
+                console.error('Không thể dọn dẹp file upload sau lỗi Cloudinary:', result.reason);
+            }
+        }
+        return next(error);
+    }
+};
+
+export {
+    upload,
+    uploadProductImages,
+    uploadAvatar,
+    validateUploadedImages,
+    storeUploadedImages
+};
 export default upload;
