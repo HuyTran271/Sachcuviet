@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { getCurrentUser } from '../../utils/auth';
-import { addToCart, createReport, getProduct, productImageUrl } from '../../utils/api';
-import Button from '../../components/common/Button';
-import Input from '../../components/common/Input';
+import { getProduct, productImageUrl } from '../../utils/api';
 import Alert from '../../components/common/Alert';
 import MarketplaceHeader from '../../components/layout/MarketplaceHeader';
 import './ProductDetail.css';
@@ -26,7 +24,6 @@ function getShopName(product) {
 
 export default function ProductDetail() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [user] = useState(getCurrentUser);
 
   const [product, setProduct] = useState(null);
@@ -34,13 +31,7 @@ export default function ProductDetail() {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
 
-  const [quantity, setQuantity] = useState(1);
-  const [adding, setAdding] = useState(false);
 
-  const [showReportForm, setShowReportForm] = useState(false);
-  const [reportReason, setReportReason] = useState('');
-  const [reportError, setReportError] = useState('');
-  const [reporting, setReporting] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -68,54 +59,8 @@ export default function ProductDetail() {
   const stock = product?.stock ?? 0;
   const outOfStock = stock <= 0;
 
-  const handleQuantityChange = (event) => {
-    const value = parseInt(event.target.value, 10);
-    if (Number.isNaN(value)) {
-      setQuantity(1);
-      return;
-    }
-    setQuantity(Math.min(Math.max(1, value), Math.max(1, stock)));
-  };
 
-  const handleAddToCart = async () => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-    setAdding(true);
-    setNotice('');
-    setError('');
-    try {
-      await addToCart(product._id, quantity);
-      setNotice(`Đã thêm ${quantity} cuốn "${product.name}" vào giỏ hàng.`);
-    } catch (err) {
-      setError(err.message || 'Không thêm được vào giỏ hàng.');
-    } finally {
-      setAdding(false);
-    }
-  };
 
-  const handleReportSubmit = async (event) => {
-    event.preventDefault();
-    const reason = reportReason.trim();
-    if (!reason) {
-      setReportError('Vui lòng nhập lý do báo cáo.');
-      return;
-    }
-    setReporting(true);
-    setReportError('');
-    try {
-      // Backend nhận payload { product, reason } (xem ghi chú trong utils/api.js).
-      await createReport({ product: product._id, reason });
-      setNotice('Đã gửi báo cáo vi phạm. Cảm ơn bạn đã phản hồi.');
-      setReportReason('');
-      setShowReportForm(false);
-    } catch (err) {
-      setReportError(err.message || 'Không gửi được báo cáo.');
-    } finally {
-      setReporting(false);
-    }
-  };
 
   const mainImage = productImageUrl(product?.images?.[0]);
 
@@ -194,65 +139,7 @@ export default function ProductDetail() {
                   )}
                 </dl>
 
-                <div className="product-detail-purchase">
-                  <Input
-                    id="product-detail-quantity"
-                    label="Số lượng"
-                    type="number"
-                    min="1"
-                    max={Math.max(1, stock)}
-                    value={quantity}
-                    onChange={handleQuantityChange}
-                    disabled={outOfStock}
-                  />
-                  {user ? (
-                    <Button
-                      variant="accent"
-                      size="lg"
-                      disabled={outOfStock}
-                      loading={adding}
-                      onClick={handleAddToCart}
-                    >
-                      Thêm vào giỏ
-                    </Button>
-                  ) : (
-                    <Button variant="accent" size="lg" onClick={() => navigate('/login')}>
-                      Đăng nhập để thêm vào giỏ
-                    </Button>
-                  )}
-                </div>
 
-                {user && (
-                  <div className="product-detail-report">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setShowReportForm((prev) => !prev)}
-                    >
-                      {showReportForm ? 'Đóng báo cáo' : 'Báo cáo vi phạm'}
-                    </Button>
-
-                    {showReportForm && (
-                      <form className="product-detail-report-form" onSubmit={handleReportSubmit}>
-                        <label htmlFor="product-detail-report-reason" className="product-detail-report-label">
-                          Lý do báo cáo
-                        </label>
-                        <textarea
-                          id="product-detail-report-reason"
-                          className="product-detail-report-textarea"
-                          rows="4"
-                          value={reportReason}
-                          onChange={(event) => setReportReason(event.target.value)}
-                          placeholder="Ví dụ: sách giả, mô tả sai sự thật, giá không đúng..."
-                        />
-                        {reportError && <Alert type="error" message={reportError} />}
-                        <Button type="submit" variant="primary" size="sm" loading={reporting}>
-                          Gửi báo cáo
-                        </Button>
-                      </form>
-                    )}
-                  </div>
-                )}
               </div>
             </div>
 

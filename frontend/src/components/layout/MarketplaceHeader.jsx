@@ -19,13 +19,7 @@ export default function MarketplaceHeader({ user }) {
         <nav className="home-nav-links" aria-label="Điều hướng chính">
           {user && (
             <>
-              <Link to="/cart" className="home-nav-link">Giỏ hàng</Link>
-              <Link to="/orders" className="home-nav-link">Đơn hàng</Link>
               <Link to="/my-shop" className="home-nav-link">Gian hàng</Link>
-              <Link to="/seller-orders" className="home-nav-link">Đơn bán</Link>
-              {user.role === 'admin' && (
-                <Link to="/admin" className="home-nav-link">Quản trị</Link>
-              )}
             </>
           )}
         </nav>

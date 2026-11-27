@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCurrentUser } from '../../utils/auth';
-import { addToCart, listCategories, listProducts, productImageUrl } from '../../utils/api';
+import { listCategories, listProducts, productImageUrl } from '../../utils/api';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import Alert from '../../components/common/Alert';
@@ -102,17 +102,6 @@ export default function Home() {
     setNotice('');
   };
 
-  const handleAddToCart = async (event, product) => {
-    event.stopPropagation();
-    setNotice('');
-    setError('');
-    try {
-      await addToCart(product._id, 1);
-      setNotice(`Đã thêm "${product.name}" vào giỏ hàng.`);
-    } catch (err) {
-      setError(err.message || 'Không thêm được vào giỏ hàng.');
-    }
-  };
 
   return (
     <div className="home-container">
@@ -251,16 +240,6 @@ export default function Home() {
                           {outOfStock ? 'Hết hàng' : `Còn hàng (${product.stock})`}
                         </p>
 
-                        {user && (
-                          <Button
-                            variant="accent"
-                            size="sm"
-                            disabled={outOfStock}
-                            onClick={(event) => handleAddToCart(event, product)}
-                          >
-                            Thêm vào giỏ
-                          </Button>
-                        )}
                         {user && shopId && (
                           <button
                             type="button"

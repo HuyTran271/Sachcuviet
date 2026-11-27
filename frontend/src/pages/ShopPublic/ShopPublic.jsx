@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getCurrentUser } from '../../utils/auth';
-import { addToCart, getShop, listProducts, productImageUrl } from '../../utils/api';
-import Button from '../../components/common/Button';
+import { getShop, listProducts, productImageUrl } from '../../utils/api';
 import Alert from '../../components/common/Alert';
 import MarketplaceHeader from '../../components/layout/MarketplaceHeader';
 import './ShopPublic.css';
@@ -63,17 +62,6 @@ export default function ShopPublic() {
     };
   }, [id]);
 
-  const handleAddToCart = async (event, product) => {
-    event.stopPropagation();
-    setNotice('');
-    setError('');
-    try {
-      await addToCart(product._id, 1);
-      setNotice(`Đã thêm "${product.name}" vào giỏ hàng.`);
-    } catch (err) {
-      setError(err.message || 'Không thêm được vào giỏ hàng.');
-    }
-  };
 
   const shopAvatar = productImageUrl(shop?.avatar);
   const ownerName = shop?.owner?.name || shop?.owner?.fullName || '';
@@ -156,16 +144,6 @@ export default function ShopPublic() {
                           {outOfStock ? 'Hết hàng' : `Còn hàng (${product.stock})`}
                         </p>
 
-                        {user && (
-                          <Button
-                            variant="accent"
-                            size="sm"
-                            disabled={outOfStock}
-                            onClick={(event) => handleAddToCart(event, product)}
-                          >
-                            Thêm vào giỏ
-                          </Button>
-                        )}
                       </div>
                     </article>
                   );
