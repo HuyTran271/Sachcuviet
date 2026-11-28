@@ -40,7 +40,7 @@ const createShop = async (req, res, next) => {
             name: name.trim(),
             owner: req.user._id,
             description: description || '',
-            avatar: req.file ? `/uploads/${req.file.filename}` : ''
+            avatar: req.file ? (req.file.cloudinaryUrl || `/uploads/${req.file.filename}`) : ''
         });
 
         res.status(201).json({ success: true, message: 'Tạo shop thành công.', shop });
@@ -77,7 +77,7 @@ const updateMyShop = async (req, res, next) => {
         }
 
         if (req.file) {
-            shop.avatar = `/uploads/${req.file.filename}`;
+            shop.avatar = req.file.cloudinaryUrl || `/uploads/${req.file.filename}`;
         }
 
         await shop.save();

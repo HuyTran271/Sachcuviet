@@ -40,7 +40,15 @@ app.use(cookieParser());
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const uploadsDir = path.join(__dirname, 'uploads');
 fs.mkdirSync(uploadsDir, { recursive: true });
-app.use('/uploads', express.static(uploadsDir));
+app.use(
+    '/uploads',
+    (req, res, next) => {
+        res.setHeader('Content-Security-Policy', 'sandbox');
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+        next();
+    },
+    express.static(uploadsDir)
+);
 
 // Routes
 app.use('/api/users', userRoutes);
